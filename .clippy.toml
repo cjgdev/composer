@@ -1,0 +1,17 @@
+# Clippy configuration for Composer project
+# Configuration options: https://rust-lang.github.io/rust-clippy/master/
+
+# Allow some common patterns in music theory code
+allow-expect-in-tests = true
+allow-unwrap-in-tests = true
+
+# Set reasonable complexity thresholds for music algorithms
+cognitive-complexity-threshold = 25
+type-complexity-threshold = 100
+
+# Performance-oriented settings for audio/music processing
+avoid-breaking-exported-api = true
+msrv = "1.70.0"
+
+# Documentation requirements
+missing-docs-in-crate-items = true

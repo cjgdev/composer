@@ -1,0 +1,26 @@
+[package]
+name = "composer-core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Core music theory data structures and algorithms for Composer"
+keywords.workspace = true
+categories.workspace = true
+
+[dependencies]
+composer-config = { path = "../composer-config" }
+serde.workspace = true
+thiserror.workspace = true
+num-traits.workspace = true
+num-derive.workspace = true
+smallvec = { workspace = true, features = ["serde"] }
+ahash.workspace = true
+once_cell.workspace = true
+
+[dev-dependencies]
+composer-serialization = { path = "../composer-serialization" }
+proptest.workspace = true
+approx.workspace = true
+criterion.workspace = true

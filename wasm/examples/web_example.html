@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Composer WASM Web Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .output {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Composer WASM Web Example</h1>
+        <p>This example demonstrates how to use the Composer library in a web browser using WebAssembly.</p>
+        
+        <div>
+            <button onclick="runBasicExample()">Run Basic Chord Example</button>
+            <button onclick="runScaleExample()">Run Scale Analysis Example</button>
+            <button onclick="runSerializationExample()">Run Serialization Example</button>
+            <button onclick="clearOutput()">Clear Output</button>
+        </div>
+        
+        <div id="output" class="output">Click a button above to run examples...</div>
+    </div>
+
+    <script type="module">
+        import init, * as composer from '../composer_wasm_web.js';
+        
+        let wasmInitialized = false;
+        
+        async function initWasm() {
+            if (!wasmInitialized) {
+                try {
+                    await init();
+                    wasmInitialized = true;
+                    logOutput(`✅ Composer WASM module initialized successfully (v${composer.getVersion()})\n`);
+                } catch (error) {
+                    logError('❌ Failed to initialize WASM module: ' + error.message);
+                    throw error;
+                }
+            }
+        }
+        
+        function logOutput(message) {
+            const output = document.getElementById('output');
+            output.textContent += message + '\n';
+            output.className = 'output';
+        }
+        
+        function logError(message) {
+            const output = document.getElementById('output');
+            output.textContent += message + '\n';
+            output.className = 'output error';
+        }
+        
+        function clearOutput() {
+            document.getElementById('output').textContent = '';
+            document.getElementById('output').className = 'output';
+        }
+        
+        window.runBasicExample = async function() {
+            try {
+                await initWasm();
+                
+                logOutput('🎵 Running Basic Chord Example...');
+                
+                // Create a G7 chord
+                const chord = new composer.WasmChord(5, 7);
+                logOutput(`Created chord: ${chord.toString()}`);
+                
+                // Get chord properties
+                logOutput(`Root note: ${chord.root}`);
+                logOutput(`Chord type: ${chord.chordType}`);
+                logOutput(`Is seventh: ${chord.isSeventh()}`);
+                
+                // Work with scales
+                const majorScale = composer.WasmScaleFingerprint.major();
+                
+                // Convert to Roman numeral notation
+                const romanNumeral = composer.getRomanNumeral(chord, majorScale);
+                logOutput(`Roman numeral in C major: ${romanNumeral}`);
+                
+                // Get complexity
+                const complexity = composer.getChordComplexity(chord, "major");
+                logOutput(`Chord complexity: ${complexity}`);
+                
+                logOutput('✅ Basic chord example completed!\n');
+                
+                // Clean up
+                chord.free();
+                majorScale.free();
+                
+            } catch (error) {
+                logError('❌ Error in basic example: ' + error.message);
+            }
+        };
+        
+        window.runScaleExample = async function() {
+            try {
+                await initWasm();
+                
+                logOutput('🎼 Running Scale Analysis Example...');
+                
+                // Create different scales
+                const majorScale = composer.WasmScaleFingerprint.major();
+                const minorScale = composer.WasmScaleFingerprint.minor();
+                const harmonicMinor = composer.WasmScaleFingerprint.harmonicMinor();
+                
+                logOutput(`Major scale: ${majorScale.toString()} (${majorScale.noteCount()} notes)`);
+                logOutput(`Minor scale: ${minorScale.toString()} (${minorScale.noteCount()} notes)`);
+                logOutput(`Harmonic minor: ${harmonicMinor.toString()} (${harmonicMinor.noteCount()} notes)`);
+                
+                // Create some chords to analyze
+                const chords = [
+                    { chord: new composer.WasmChord(1, 5), name: 'C major' },
+                    { chord: new composer.WasmChord(2, 7), name: 'D minor 7' },
+                    { chord: new composer.WasmChord(5, 7), name: 'G7' }
+                ];
+                
+                for (const {chord, name} of chords) {
+                    const scaleDegrees = composer.getStableScaleDegrees(chord, majorScale);
+                    const roman = composer.getRomanNumeral(chord, majorScale);
+                    logOutput(`${name}: scale degrees [${scaleDegrees.join(', ')}], Roman: ${roman}`);
+                    chord.free();
+                }
+                
+                logOutput('✅ Scale analysis example completed!\n');
+                
+                // Clean up
+                majorScale.free();
+                minorScale.free();
+                harmonicMinor.free();
+                
+            } catch (error) {
+                logError('❌ Error in scale example: ' + error.message);
+            }
+        };
+        
+        window.runSerializationExample = async function() {
+            try {
+                await initWasm();
+                
+                logOutput('💾 Running Serialization Example...');
+                
+                // Create a chord
+                const originalChord = new composer.WasmChord(7, 7); // A7
+                logOutput(`Original chord: ${originalChord.toString()}`);
+                
+                // Serialize to hex
+                const hexString = originalChord.toHex();
+                logOutput(`Serialized (hex): ${hexString}`);
+                logOutput(`Hex length: ${hexString.length} characters`);
+                
+                // Deserialize back
+                const deserializedChord = composer.WasmChord.fromHex(hexString);
+                logOutput(`Deserialized chord: ${deserializedChord.toString()}`);
+                
+                // Verify they match
+                const match = originalChord.toString() === deserializedChord.toString();
+                logOutput(`Serialization roundtrip: ${match ? '✅ SUCCESS' : '❌ FAILED'}`);
+                
+                // Test multiple chord types
+                const testChords = [
+                    composer.WasmChord.triad(3),
+                    composer.WasmChord.seventh(11),
+                    composer.WasmChord.rest()
+                ];
+                
+                for (const testChord of testChords) {
+                    const hex = testChord.toHex();
+                    const restored = composer.WasmChord.fromHex(hex);
+                    const success = testChord.toString() === restored.toString();
+                    logOutput(`${testChord.toString()} -> ${hex} -> ${restored.toString()} ${success ? '✅' : '❌'}`);
+                    testChord.free();
+                    restored.free();
+                }
+                
+                logOutput('✅ Serialization example completed!\n');
+                
+                // Clean up
+                originalChord.free();
+                deserializedChord.free();
+                
+            } catch (error) {
+                logError('❌ Error in serialization example: ' + error.message);
+            }
+        };
+        
+        window.clearOutput = clearOutput;
+        
+        // Initialize WASM on page load
+        initWasm().catch(error => {
+            logError('Failed to initialize WASM on page load: ' + error.message);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+[package]
+name = "composer-serialization"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Binary serialization and data processing for Composer"
+keywords.workspace = true
+categories.workspace = true
+
+[dependencies]
+composer-core = { path = "../composer-core" }
+composer-config = { path = "../composer-config" }
+serde.workspace = true
+thiserror.workspace = true
+byteorder = "1.5"
+bincode.workspace = true
+rmp-serde.workspace = true
+regex.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+criterion.workspace = true

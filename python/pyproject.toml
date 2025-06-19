@@ -1,0 +1,97 @@
+[build-system]
+requires = ["maturin>=1.5,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "composer"
+version = "0.1.1"
+description = "High-performance music theory and composition library with AI-powered features"
+requires-python = ">=3.8"
+license = {text = "MIT OR Apache-2.0"}
+authors = [
+    {name = "Composer Contributors"}
+]
+readme = "README.md"
+homepage = "https://github.com/cjgdev/composer"
+repository = "https://github.com/cjgdev/composer"
+keywords = ["music", "theory", "chord", "ai", "composition"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Rust",
+    "Topic :: Multimedia :: Sound/Audio",
+    "Topic :: Scientific/Engineering",
+]
+
+dependencies = [
+    # Add any pure Python dependencies here if needed
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0",
+    "pytest-cov",
+    "pytest-benchmark",
+]
+dev = [
+    "ruff",
+    "nox",
+]
+docs = [
+    "sphinx>=7.0.0",
+    "sphinx-rtd-theme>=1.3.0",
+    "myst-parser>=2.0.0",
+    "linkify-it-py>=2.0.0",  # Required for myst-parser linkify extension
+    # "sphinxcontrib-rust>=0.8.0",  # Disabled temporarily due to compatibility issues
+    "sphinx-autodoc-typehints>=1.24.0",
+    "sphinx-copybutton>=0.5.2",
+]
+all = [
+    "composer[test,dev,docs]",
+]
+
+[tool.maturin]
+# This is the key setting for a monorepo. It tells maturin where to find the
+# Cargo.toml for the FFI crate we want to build.
+manifest-path = "../rust/crates/composer-ffi/Cargo.toml"
+
+# This enables the "src layout" for our Python code.
+python-source = "src"
+
+[tool.ruff]
+# Set the minimum Python version to target for compatibility checks.
+target-version = "py38"
+line-length = 88
+# Tell ruff where to find the Python source code.
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+# Select rule sets. 'I' is for isort, 'B' for flake8-bugbear, 'ANN' for flake8-annotations.
+select = ["E", "F", "I", "B", "ANN", "UP", "C90"]
+# Ignore specific rules if needed.
+ignore = ["ANN101", "F403"]  # Ignore missing type hint for `self` in methods, star imports
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=composer",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]

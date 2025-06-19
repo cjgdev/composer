@@ -1,0 +1,230 @@
+/* Custom CSS for Composer Documentation */
+
+/* Musical notation styling */
+.chord {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    color: #2c3e50;
+    background: #ecf0f1;
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.scale-degree {
+    font-weight: bold;
+    color: #8e44ad;
+}
+
+.roman-numeral {
+    font-family: 'Times New Roman', serif;
+    font-weight: bold;
+    color: #c0392b;
+}
+
+/* Musical example blocks */
+.musical-example {
+    border: 2px solid #3498db;
+    border-radius: 8px;
+    background: #f8f9fa;
+    margin: 1em 0;
+}
+
+.musical-example .musical-code {
+    background: #2c3e50 !important;
+    color: #ecf0f1 !important;
+    border-radius: 6px;
+    padding: 12px;
+    margin: 8px;
+}
+
+/* Performance metrics table */
+.performance-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+}
+
+.performance-table th,
+.performance-table td {
+    border: 1px solid #bdc3c7;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+.performance-table th {
+    background: #3498db;
+    color: white;
+    font-weight: bold;
+}
+
+.performance-table tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+.performance-table tr:hover {
+    background: #e3f2fd;
+}
+
+/* API documentation enhancements */
+.py.class > dt {
+    background: #2980b9;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px 4px 0 0;
+}
+
+.py.method > dt {
+    background: #27ae60;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 3px;
+    margin-top: 10px;
+}
+
+.py.function > dt {
+    background: #e67e22;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 3px;
+    margin-top: 10px;
+}
+
+/* Code examples with musical context */
+.highlight-python {
+    border-left: 4px solid #3498db;
+    padding-left: 12px;
+}
+
+/* Admonitions for musical concepts */
+.admonition.musical-note {
+    border-left: 5px solid #f39c12;
+    background: #fef9e7;
+    padding: 12px;
+    margin: 1em 0;
+}
+
+.admonition.musical-note .admonition-title {
+    color: #f39c12;
+    font-weight: bold;
+}
+
+/* Section headers for musical topics */
+h2.musical-section {
+    border-bottom: 3px solid #3498db;
+    padding-bottom: 8px;
+    color: #2c3e50;
+}
+
+h3.musical-subsection {
+    border-left: 4px solid #e74c3c;
+    padding-left: 12px;
+    color: #c0392b;
+}
+
+/* Navigation enhancements */
+.wy-nav-content-wrap {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.wy-nav-side {
+    background: #2c3e50;
+}
+
+/* Logo and branding */
+.wy-side-nav-search {
+    background: #34495e;
+}
+
+.wy-side-nav-search input[type="text"] {
+    border: 2px solid #3498db;
+    border-radius: 4px;
+}
+
+/* TOC tree styling */
+.wy-menu-vertical li.current > a {
+    background: #3498db;
+    border-right: 3px solid #2980b9;
+}
+
+.wy-menu-vertical li.current a:hover {
+    background: #2980b9;
+}
+
+/* Footer enhancements */
+.rst-footer-buttons {
+    margin-top: 2em;
+    padding-top: 1em;
+    border-top: 2px solid #ecf0f1;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .musical-example {
+        margin: 0.5em 0;
+    }
+    
+    .performance-table {
+        font-size: 0.9em;
+    }
+    
+    .musical-example .musical-code {
+        padding: 8px;
+        margin: 4px;
+    }
+}
+
+/* Print styles */
+@media print {
+    .musical-example {
+        border: 1px solid #000;
+        background: #fff;
+        break-inside: avoid;
+    }
+    
+    .chord, .scale-degree, .roman-numeral {
+        background: none;
+        color: #000;
+    }
+}
+
+/* Syntax highlighting improvements for musical code */
+.highlight .c1 { color: #95a5a6; font-style: italic; } /* Comments */
+.highlight .s2 { color: #27ae60; } /* Strings */
+.highlight .nb { color: #3498db; } /* Built-ins */
+.highlight .n { color: #2c3e50; } /* Names */
+
+/* Special styling for chord progressions in code */
+.chord-progression {
+    font-family: 'Courier New', monospace;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 8px;
+    margin: 8px 0;
+    display: inline-block;
+}
+
+/* Highlight important musical concepts */
+.musical-concept {
+    background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 500;
+}
+
+/* Version badge */
+.version-badge {
+    background: #e74c3c;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+/* Enhanced search results */
+.search-results .highlighted {
+    background: #f1c40f;
+    padding: 2px 4px;
+    border-radius: 2px;
+}

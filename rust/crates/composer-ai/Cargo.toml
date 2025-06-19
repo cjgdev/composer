@@ -1,0 +1,26 @@
+[package]
+name = "composer-ai"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "AI-powered musical intelligence and chord progression suggestions for Composer"
+keywords.workspace = true
+categories.workspace = true
+
+[dependencies]
+composer-core = { path = "../composer-core" }
+composer-serialization = { path = "../composer-serialization" }
+composer-config = { path = "../composer-config" }
+serde.workspace = true
+thiserror.workspace = true
+ahash.workspace = true
+dashmap.workspace = true
+parking_lot.workspace = true
+rayon.workspace = true
+smallvec.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+criterion.workspace = true

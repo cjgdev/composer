@@ -1,0 +1,116 @@
+{
+  "name": "@composer/composer-wasm",
+  "version": "0.1.1",
+  "description": "WebAssembly bindings for the Composer music theory and AI library",
+  "main": "composer_wasm.js",
+  "types": "composer_wasm.d.ts",
+  "files": [
+    "composer_wasm.js",
+    "composer_wasm.d.ts",
+    "composer_wasm_bg.wasm",
+    "composer_wasm_bg.js",
+    "composer_wasm_web.js",
+    "composer_wasm_web.d.ts",
+    "composer_wasm_web_bg.wasm",
+    "composer_wasm_web_bg.js",
+    "examples/"
+  ],
+  "scripts": {
+    "build": "npm run build:nodejs && npm run build:web && npm run build:bundler",
+    "build:nodejs": "wasm-pack build ../rust/crates/composer-wasm --target nodejs --out-dir . --out-name composer_wasm",
+    "build:web": "wasm-pack build ../rust/crates/composer-wasm --target web --out-dir . --out-name composer_wasm_web",
+    "build:bundler": "wasm-pack build ../rust/crates/composer-wasm --target bundler --out-dir . --out-name composer_wasm_bundler",
+    "test": "npm run test:wasm && npm run test:examples",
+    "test:wasm": "wasm-pack test ../rust/crates/composer-wasm --node",
+    "test:browser": "wasm-pack test ../rust/crates/composer-wasm --headless --firefox --chrome",
+    "test:examples": "npm run test:node-example && npm run test:ts-examples",
+    "test:node-example": "node examples/node_example.js",
+    "test:ts-examples": "npm run ts:compile && npm run ts:run-examples",
+    "clean": "rm -rf composer_wasm* .wasm-pack-log dist/ build/",
+    "example:node": "node examples/node_example.js",
+    "example:web": "cd examples && python -m http.server 8000",
+    "example:ts": "npm run ts:compile && node dist/examples/typescript/01_basic_chords.js",
+    "ts:install": "npm install -g typescript ts-node @types/node",
+    "ts:compile": "tsc",
+    "ts:run-examples": "npm run ts:run:basic && npm run ts:run:scales && npm run ts:run:serialization && npm run ts:run:workflow",
+    "ts:run:basic": "node dist/examples/typescript/01_basic_chords.js",
+    "ts:run:scales": "node dist/examples/typescript/02_scale_fingerprints.js",
+    "ts:run:serialization": "node dist/examples/typescript/04_serialization.js",
+    "ts:run:workflow": "node dist/examples/typescript/05_complete_workflow.js",
+    "docs": "npm run docs:generate",
+    "docs:generate": "echo 'TypeScript API documentation available in composer_wasm.d.ts'",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint . --write",
+    "format": "biome format .",
+    "format:write": "biome format . --write",
+    "check": "biome check .",
+    "check:fix": "biome check . --write",
+    "prepublishOnly": "npm run clean && npm run build && npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cjgdev/composer.git"
+  },
+  "keywords": [
+    "music",
+    "theory",
+    "chord",
+    "ai",
+    "composition",
+    "webassembly",
+    "wasm",
+    "typescript",
+    "javascript",
+    "nodejs",
+    "browser",
+    "harmonic-analysis",
+    "roman-numerals",
+    "serialization"
+  ],
+  "author": "Composer Contributors",
+  "license": "MIT OR Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/cjgdev/composer/issues"
+  },
+  "homepage": "https://github.com/cjgdev/composer#readme",
+  "devDependencies": {
+    "@biomejs/biome": "^2.0.0",
+    "@types/node": "^18.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0",
+    "webpack": "^5.0.0",
+    "webpack-cli": "^4.0.0",
+    "webpack-dev-server": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./composer_wasm.js",
+      "require": "./composer_wasm.js",
+      "types": "./composer_wasm.d.ts"
+    },
+    "./web": {
+      "import": "./composer_wasm_web.js",
+      "types": "./composer_wasm_web.d.ts"
+    },
+    "./bundler": {
+      "import": "./composer_wasm_bundler.js",
+      "types": "./composer_wasm_bundler.d.ts"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "composer_wasm.d.ts"
+      ],
+      "web": [
+        "composer_wasm_web.d.ts"
+      ],
+      "bundler": [
+        "composer_wasm_bundler.d.ts"
+      ]
+    }
+  }
+}

@@ -1,0 +1,33 @@
+[package]
+name = "composer-ffi"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Python FFI bindings for the Composer music theory and AI library"
+keywords.workspace = true
+categories.workspace = true
+
+[lib]
+# This name determines the final module name in Python.
+# `import composer` will import the compiled library.
+name = "composer"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+composer-core = { path = "../composer-core" }
+composer-serialization = { path = "../composer-serialization" }
+composer-ai = { path = "../composer-ai" }
+composer-config = { path = "../composer-config" }
+pyo3.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+hex.workspace = true
+smallvec.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+
+[build-dependencies]
+pyo3-build-config = "0.20"

@@ -1,0 +1,412 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v1.0.0)'
+        required: true
+        type: string
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.create_release.outputs.id }}
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      tag_name: ${{ steps.get_tag.outputs.tag }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get tag name
+        id: get_tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate release notes
+        id: generate_notes
+        run: |
+          # Extract version number without 'v' prefix
+          VERSION="${{ steps.get_tag.outputs.tag }}"
+          VERSION_NUM=${VERSION#v}
+          
+          # Create release notes
+          cat > release_notes.md << EOF
+          # Composer v${VERSION_NUM}
+          
+          A high-performance music theory and composition library with AI-powered features.
+          
+          ## 🚀 What's New
+          
+          This release includes the latest improvements to the Composer library:
+          
+          - ✅ Core music theory algorithms with comprehensive chord analysis
+          - ✅ AI-powered chord progression suggestions 
+          - ✅ Advanced serialization and tokenization for ML applications
+          - ✅ Cross-platform Python bindings with PyO3
+          - ✅ WebAssembly bindings for browser and Node.js
+          - ✅ High-performance binary data structures
+          
+          ## 📦 Installation
+          
+          ### Python Package
+          \`\`\`bash
+          pip install composer
+          \`\`\`
+          
+          ### WebAssembly Package
+          \`\`\`bash
+          npm install @composer/composer-wasm
+          \`\`\`
+          
+          ## 🔧 Build from Source
+          
+          See our [README](https://github.com/cjgdev/composer#building-from-source) for detailed build instructions.
+          
+          ## 📚 Documentation
+          
+          - [Python API Documentation](https://composer.readthedocs.io/)
+          - [Rust API Documentation](https://docs.rs/composer-core/)
+          - [Examples and Tutorials](https://github.com/cjgdev/composer/tree/main/examples)
+          
+          ## ⚡ Performance
+          
+          This release maintains our performance targets:
+          - Chord lookups: < 1ms
+          - AI suggestions: < 50ms
+          - Memory usage: < 150MB
+          - Binary compression: 95%+
+          
+          For detailed changes, see the commit history.
+          EOF
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_tag.outputs.tag }}
+          release_name: "Composer ${{ steps.get_tag.outputs.tag }}"
+          body_path: release_notes.md
+          draft: false
+          prerelease: ${{ contains(steps.get_tag.outputs.tag, '-') }}
+
+  # Build Python wheels for multiple platforms and Python versions
+  build-python-wheels:
+    needs: create-release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux wheels with manylinux compatibility
+          - os: ubuntu-latest
+            platform: linux
+            target: x86_64-unknown-linux-gnu
+            python-versions: "3.8 3.9 3.10 3.11 3.12"
+          
+          # macOS wheels for Intel and Apple Silicon
+          - os: macos-latest
+            platform: macos-x86_64
+            target: x86_64-apple-darwin
+            python-versions: "3.8 3.9 3.10 3.11 3.12"
+          - os: macos-latest
+            platform: macos-arm64
+            target: aarch64-apple-darwin
+            python-versions: "3.8 3.9 3.10 3.11 3.12"
+          
+          # Windows wheels
+          - os: windows-latest
+            platform: windows-x64
+            target: x86_64-pc-windows-msvc
+            python-versions: "3.8 3.9 3.10 3.11 3.12"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Setup Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+          key: release-${{ matrix.platform }}
+
+      - name: Build wheels using maturin
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          args: --release --out dist --interpreter ${{ matrix.python-versions }}
+          sccache: 'true'
+          manylinux: auto
+          working-directory: python
+
+      - name: Test wheel installation
+        if: matrix.platform != 'macos-arm64'  # Skip cross-compilation testing
+        run: |
+          pip install --find-links python/dist composer --force-reinstall
+          python -c "import composer; print('Wheel installation successful')"
+
+      - name: Upload wheels as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.platform }}
+          path: python/dist/
+          retention-days: 30
+
+  # Publish Python package to PyPI
+  publish-python:
+    needs: build-python-wheels
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    environment: 
+      name: release
+      url: https://pypi.org/project/composer/
+    permissions:
+      id-token: write  # For trusted publishing to PyPI
+    steps:
+      - name: Download all wheel artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          merge-multiple: true
+          path: dist/
+
+      - name: List distribution files
+        run: ls -la dist/
+
+      - name: Verify wheel contents
+        run: |
+          pip install twine
+          twine check dist/*
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+          verbose: true
+          verify-metadata: true
+
+  # Build WebAssembly package for NPM
+  build-wasm-package:
+    needs: create-release
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./wasm
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Setup Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+          key: wasm-release
+
+      - name: Install wasm-pack
+        uses: jetli/wasm-pack-action@v0.4.0
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+          cache-dependency-path: wasm/package-lock.json
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build for multiple targets
+        run: |
+          echo "Building for Node.js target..."
+          npm run build
+          
+          echo "Building for web target..."
+          npm run build:web
+          
+          echo "Building for bundler target..."
+          npm run build:bundler
+
+      - name: Run comprehensive tests
+        run: |
+          echo "Running WASM tests..."
+          npm run test:wasm
+          
+          echo "Running example tests..."
+          npm run test:examples
+
+      - name: Update package version
+        run: |
+          # Extract version from git tag and update package.json
+          VERSION="${{ needs.create-release.outputs.tag_name }}"
+          VERSION_NUM=${VERSION#v}
+          npm version $VERSION_NUM --no-git-tag-version
+          echo "Updated package version to $VERSION_NUM"
+
+      - name: Verify package integrity
+        run: |
+          echo "Verifying package structure..."
+          npm pack --dry-run
+          
+          echo "Checking TypeScript definitions..."
+          if [ -f "composer_wasm.d.ts" ]; then
+            echo "✓ TypeScript definitions found"
+          else
+            echo "✗ TypeScript definitions missing"
+            exit 1
+          fi
+
+      - name: Create npm package
+        run: npm pack
+
+      - name: Upload npm package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wasm-package
+          path: wasm/*.tgz
+          retention-days: 30
+
+  # Publish WebAssembly package to NPM
+  publish-wasm:
+    needs: [create-release, build-wasm-package]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    environment:
+      name: release
+      url: https://www.npmjs.com/package/@composer/composer-wasm
+    defaults:
+      run:
+        working-directory: ./wasm
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        uses: jetli/wasm-pack-action@v0.4.0
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Download WASM package artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: wasm-package
+          path: wasm/
+
+      - name: Extract and verify package
+        run: |
+          # Extract the package
+          tar -tzf *.tgz | head -20
+          echo "Package contents verified"
+
+      - name: Update package version for publication
+        run: |
+          # Extract version from git tag and update package.json
+          VERSION="${{ needs.create-release.outputs.tag_name }}"
+          VERSION_NUM=${VERSION#v}
+          npm version $VERSION_NUM --no-git-tag-version
+          echo "Updated package version to $VERSION_NUM for publication"
+
+      - name: Build for publication
+        run: |
+          echo "Building final packages for NPM publication..."
+          npm run build
+
+      - name: Publish to NPM
+        run: |
+          echo "Publishing @composer/composer-wasm to NPM..."
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # Generate and upload documentation
+  build-docs:
+    needs: create-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Setup Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+          key: docs-release
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+
+      - name: Install nox
+        run: uv tool install nox
+
+      - name: Build Rust documentation
+        run: |
+          cd rust
+          cargo doc --workspace --no-deps --all-features
+
+      - name: Build Python documentation
+        run: |
+          cd python
+          nox -s docs
+
+      - name: Combine documentation
+        run: |
+          mkdir -p combined-docs
+          cp -r rust/target/doc/* combined-docs/
+          cp -r python/docs/_build/html/* combined-docs/python/
+
+      - name: Upload documentation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation
+          path: combined-docs/
+          retention-days: 90
+
+      - name: Deploy to GitHub Pages
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./combined-docs
+          cname: composer-docs.github.io

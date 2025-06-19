@@ -1,0 +1,133 @@
+# Composer Project Root .gitignore
+# =====================================
+
+# Operating System Files
+# -----------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+
+# Editor and IDE Files
+# --------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# Log Files
+# ---------
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary Files
+# ---------------
+*.tmp
+*.temp
+.cache/
+.sass-cache/
+
+# Documentation Build
+# -------------------
+docs/_build/
+site/
+
+# Environment Files
+# -----------------
+.env
+.env.local
+.env.*.local
+
+# Archive Files
+# -------------
+*.tar.gz
+*.zip
+*.7z
+*.rar
+
+# Performance and Profiling
+# -------------------------
+*.prof
+*.heapprofile
+*.cpuprofile
+
+# Coverage Reports
+# ----------------
+coverage/
+.nyc_output/
+*.lcov
+
+# Backup Files
+# ------------
+*.bak
+*.backup
+*.orig
+
+# Build Artifacts (General)
+# -------------------------
+dist/
+build/
+target/
+pkg/
+
+# Local Configuration
+# -------------------
+.local/
+local.properties
+
+# JetBrains IDEs
+# --------------
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Visual Studio Code
+# ------------------
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Emacs
+# -----
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Vim
+# ---
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+Session.vim
+.netrwhist
+
+# Project Specific
+# ----------------
+*.benchmark
+*.test-output
+.benchmarks/
+test-results/

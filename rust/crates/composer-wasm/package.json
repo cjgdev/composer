@@ -1,0 +1,33 @@
+{
+  "name": "composer-wasm",
+  "type": "module",
+  "collaborators": [
+    "Composer Contributors"
+  ],
+  "description": "WebAssembly bindings for Composer music theory library",
+  "version": "0.1.1",
+  "license": "MIT OR Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cjgdev/composer"
+  },
+  "files": [
+    "composer_wasm_bundler_bg.wasm",
+    "composer_wasm_bundler.js",
+    "composer_wasm_bundler_bg.js",
+    "composer_wasm_bundler.d.ts"
+  ],
+  "main": "composer_wasm_bundler.js",
+  "types": "composer_wasm_bundler.d.ts",
+  "sideEffects": [
+    "./composer_wasm_bundler.js",
+    "./snippets/*"
+  ],
+  "keywords": [
+    "music",
+    "theory",
+    "chord",
+    "ai",
+    "composition"
+  ]
+}

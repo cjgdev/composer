@@ -17,9 +17,9 @@
   ],
   "scripts": {
     "build": "npm run build:nodejs && npm run build:web && npm run build:bundler",
-    "build:nodejs": "wasm-pack build ../rust/crates/composer-wasm --target nodejs --out-dir . --out-name composer_wasm",
-    "build:web": "wasm-pack build ../rust/crates/composer-wasm --target web --out-dir . --out-name composer_wasm_web",
-    "build:bundler": "wasm-pack build ../rust/crates/composer-wasm --target bundler --out-dir . --out-name composer_wasm_bundler",
+    "build:nodejs": "wasm-pack build ../rust/crates/composer-wasm --target nodejs --out-dir . --out-name composer_wasm --no-pack",
+    "build:web": "wasm-pack build ../rust/crates/composer-wasm --target web --out-dir . --out-name composer_wasm_web --no-pack",
+    "build:bundler": "wasm-pack build ../rust/crates/composer-wasm --target bundler --out-dir . --out-name composer_wasm_bundler --no-pack",
     "test": "npm run test:wasm && npm run test:examples",
     "test:wasm": "wasm-pack test ../rust/crates/composer-wasm --node",
     "test:browser": "wasm-pack test ../rust/crates/composer-wasm --headless --firefox --chrome",
@@ -45,6 +45,8 @@
     "format:write": "biome format . --write",
     "check": "biome check .",
     "check:fix": "biome check . --write",
+    "clean-source": "rm -f ../rust/crates/composer-wasm/composer_wasm* ../rust/crates/composer-wasm/package.json",
+    "postbuild": "npm run clean-source",
     "prepublishOnly": "npm run clean && npm run build && npm run test"
   },
   "repository": {

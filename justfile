@@ -145,7 +145,7 @@ examples-wasm:
 # ========
 
 # Clean all build artifacts
-clean: clean-rust clean-python clean-wasm
+clean: clean-rust clean-python clean-wasm clean-wasm-source
     @echo "✅ All artifacts cleaned!"
 
 # Clean Rust artifacts
@@ -164,6 +164,11 @@ clean-python:
 clean-wasm:
     @echo "🌐 Cleaning WASM artifacts..."
     cd wasm && npm run clean
+
+# Clean WASM source directory of generated files
+clean-wasm-source:
+    @echo "🧹 Cleaning WASM source directory..."
+    cd wasm && npm run clean-source
 
 # Release Management
 # ==================

@@ -190,7 +190,7 @@ impl Default for PolynomialModel {
         feature_weights.insert("melodic_complexity".to_string(), 0.15);
 
         Self {
-            coefficients: [1.0, 0.5, 4.0, 0.0], // Conservative polynomial that starts at 0
+            coefficients: [0.1, 0.2, 0.8, 0.2], // More conservative coefficients to prevent saturation
             feature_weights,
             accuracy: 0.85,
         }
@@ -362,25 +362,33 @@ impl MusicalAnalyzer {
         progression: &[Chord],
         factors: &ComplexityFactors,
     ) -> AiResult<f64> {
-        let mut complexity = 0.0;
+        let mut complexity = 1.0; // Start with base complexity
 
-        // Unique chord factor
-        complexity += (factors.unique_chords as f64 / progression.len() as f64) * 2.0;
+        // Unique chord factor (more balanced scaling)
+        complexity += (factors.unique_chords as f64 / progression.len() as f64) * 1.0;
 
-        // Average chord complexity
-        complexity += factors.avg_chord_complexity * 2.0;
+        // Average chord complexity (enhanced scaling)
+        let normalized_chord_complexity = factors.avg_chord_complexity - 1.0; // Remove base complexity
+        complexity += normalized_chord_complexity * 3.0; // Amplify the differences
 
         // Key changes increase complexity
         complexity += factors.key_changes as f64 * 1.5;
 
-        // Extended harmonies add complexity
-        complexity += (factors.extended_harmonies as f64 / progression.len() as f64) * 3.0;
+        // Extended harmonies add complexity (enhanced weighting)
+        complexity += (factors.extended_harmonies as f64 / progression.len() as f64) * 3.5;
 
         // Uncommon progressions add complexity
-        complexity += factors.uncommon_progressions as f64 * 0.5;
+        complexity += factors.uncommon_progressions as f64 * 0.2;
 
-        // Normalize to 0-10 scale
-        Ok(complexity.min(10.0)) // Max complexity scale
+        // Debug output for debugging this test
+        #[cfg(test)]
+        if progression.len() == 4 {
+            println!("DEBUG harmonic_complexity: avg_chord={:.2}, extended={}, normalized={:.2}, final={:.2}", 
+                factors.avg_chord_complexity, factors.extended_harmonies, normalized_chord_complexity, complexity);
+        }
+
+        // Normalize to 0-10 scale with better scaling
+        Ok(complexity.min(10.0))
     }
 
     /// Calculate rhythmic complexity score
@@ -427,19 +435,60 @@ impl MusicalAnalyzer {
         complexity.min(10.0)
     }
 
-    /// Calculate melodic complexity score
+    /// Calculate melodic complexity score per specification lines 247-250
     fn calculate_melodic_complexity(&self, progression: &[Chord]) -> f64 {
-        // Simplified melodic complexity based on chord tones
         let mut complexity: f64 = 1.5; // Base complexity
 
-        // Voice leading intervals contribute to melodic complexity
+        // Note range and tessiture (simplified via chord roots)
+        let roots: Vec<u8> = progression.iter().map(|c| c.root).collect();
+        let min_root = roots.iter().min().unwrap_or(&0);
+        let max_root = roots.iter().max().unwrap_or(&0);
+        let range = (*max_root as i8 - *min_root as i8).abs();
+        complexity += (range as f64 / 12.0) * 1.0; // Normalize by octave
+
+        // Interval complexity analysis
+        let mut interval_complexity = 0.0;
         for window in progression.windows(2) {
             let interval = self.calculate_root_interval(&window[0], &window[1]);
-            if interval > 5 {
-                // Large intervals are more complex
-                complexity += 0.3;
-            }
+            
+            // Interval difficulty assessment
+            let interval_difficulty = match interval {
+                0 => 0.0,     // Unison (no movement)
+                1 => 0.2,     // Minor second (chromatic)
+                2 => 0.1,     // Major second (step)
+                3 => 0.2,     // Minor third
+                4 => 0.3,     // Major third
+                5 => 0.4,     // Perfect fourth
+                6 => 0.5,     // Tritone (complex)
+                7 => 0.4,     // Perfect fifth
+                8..=11 => 0.6, // Large intervals (6th, 7th, etc.)
+                _ => 0.7,     // Very large intervals
+            };
+            interval_complexity += interval_difficulty;
         }
+        complexity += interval_complexity;
+
+        // Melodic contour analysis (direction changes)
+        let mut direction_changes = 0;
+        let mut last_direction: Option<bool> = None; // true = up, false = down
+        
+        for window in progression.windows(2) {
+            let current_direction = window[1].root > window[0].root;
+            
+            if let Some(prev_direction) = last_direction {
+                if prev_direction != current_direction {
+                    direction_changes += 1;
+                }
+            }
+            last_direction = Some(current_direction);
+        }
+        
+        // Direction changes add melodic complexity
+        complexity += (direction_changes as f64 / progression.len() as f64) * 1.5;
+
+        // Rhythmic complexity contribution (simplified via chord density)
+        let chord_density = progression.len() as f64 / 4.0; // Normalize to 4-chord baseline
+        complexity += chord_density * 0.3;
 
         complexity.min(10.0)
     }
@@ -484,6 +533,7 @@ impl MusicalAnalyzer {
 
         let polynomial_result = a * x.powi(3) + b * x.powi(2) + c * x + d;
 
+
         // Scale back to 0-10 range and clamp
         (polynomial_result * 10.0).max(0.0).min(10.0) // Scale to 0-10 range
     }
@@ -520,23 +570,59 @@ impl MusicalAnalyzer {
     }
 
     /// Helper methods for complexity calculation
-    fn calculate_single_chord_complexity(&self, chord: &Chord) -> f64 {
+    pub fn calculate_single_chord_complexity(&self, chord: &Chord) -> f64 {
         let mut complexity = 1.0;
 
-        // Extended chords are more complex
-        if chord.chord_type >= 7 {
-            // Assuming 7+ indicates extended harmony
-            complexity += 1.0;
+        // Chord Type complexity (weight: 0.4) - enhanced to better differentiate complexity
+        let chord_type_weight = 0.4;
+        let chord_type_complexity = match chord.chord_type {
+            5 => 0.0,  // Triad: no additional complexity
+            7 => 1.5,  // Seventh chords: moderate complexity  
+            9 => 3.0,  // Extended: ninth chords (significant jump)
+            11 => 4.0, // Extended: eleventh chords (high complexity)
+            13 => 5.0, // Extended: thirteenth chords (maximum chord complexity)
+            _ => 0.8,  // Other chord types (sus, dim, aug, etc.)
+        };
+        complexity += chord_type_complexity * chord_type_weight;
+
+        // Alterations complexity (weight: 0.25) - per specification lines 309-313
+        let alteration_weight = 0.25;
+        let mut alteration_complexity = 0.0;
+        for alteration in &chord.alterations {
+            let alt_value = match alteration.as_str() {
+                "#11" | "b13" => 0.8, // Complex alterations
+                "b9" | "#9" | "#5" | "b5" => 0.5, // Standard alterations
+                _ => 0.5, // Default alteration value
+            };
+            alteration_complexity += alt_value;
         }
+        complexity += alteration_complexity * alteration_weight;
 
-        // Alterations add complexity
-        complexity += chord.alterations.len() as f64 * 0.5;
+        // Applied chords complexity (weight: 0.2) - per specification lines 314-316
+        let applied_weight = 0.2;
+        let applied_complexity = if chord.applied > 0 {
+            1.0 // Applied dominant adds complexity
+        } else {
+            0.0
+        };
+        complexity += applied_complexity * applied_weight;
 
-        // Suspensions add complexity
-        complexity += chord.suspensions.len() as f64 * 0.3;
-
-        // Added notes increase complexity
-        complexity += chord.adds.len() as f64 * 0.4;
+        // Inversions/Extensions complexity (weight: 0.1) - per specification lines 322-325
+        let extension_weight = 0.1;
+        let mut extension_complexity = 0.0;
+        
+        // Inversions
+        if chord.inversion > 0 {
+            extension_complexity += chord.inversion as f64 * 0.5;
+        }
+        
+        // Suspensions
+        extension_complexity += chord.suspensions.len() as f64 * 0.3;
+        
+        // Added notes (omissions would be here too if we had them)
+        extension_complexity += chord.adds.len() as f64 * 0.4;
+        
+        complexity += extension_complexity * extension_weight;
 
         complexity
     }
@@ -590,15 +676,27 @@ impl MusicalAnalyzer {
         for window in progression.windows(2) {
             let interval = self.calculate_root_interval(&window[0], &window[1]);
 
-            // Large intervals are more complex
-            if interval > 5 {
-                complexity += 0.5;
+            // Voice leading quality assessment per specification
+            match interval {
+                0 => complexity += 0.1, // Static (minimal complexity)
+                1 => complexity += 0.4, // Chromatic (moderate complexity)
+                2 => complexity += 0.2, // Step-wise (smooth)
+                3..=4 => complexity += 0.3, // Skip intervals (moderate)
+                5..=6 => complexity += 0.6, // Larger intervals (more complex)
+                _ => complexity += 0.8, // Very large intervals (complex)
             }
 
-            // Chromatic movement is complex
-            if interval == 1 {
-                complexity += 0.3;
-            }
+            // Additional complexity for chord type changes
+            let type_change_complexity = if window[0].chord_type != window[1].chord_type {
+                0.2 // Different chord types add voice leading complexity
+            } else {
+                0.0
+            };
+            complexity += type_change_complexity;
+
+            // Inversion changes add complexity
+            let inversion_change = (window[1].inversion as i8 - window[0].inversion as i8).abs();
+            complexity += inversion_change as f64 * 0.1;
         }
 
         complexity / (progression.len() as f64).max(1.0)
@@ -711,9 +809,26 @@ impl MusicalAnalyzer {
         tempo_bpm: Option<f64>,
         time_signature: Option<(u8, u8)>,
     ) -> String {
+        // Create a unique key that includes the actual chord content
+        let mut chord_descriptors = Vec::new();
+        for chord in progression {
+            // Use a detailed chord descriptor that captures all important properties
+            let descriptor = format!(
+                "{}:{}:{}:{}:{}:{}:{}",
+                chord.root,
+                chord.chord_type,
+                chord.inversion,
+                chord.applied,
+                chord.adds.len(),
+                chord.alterations.len(),
+                chord.suspensions.len()
+            );
+            chord_descriptors.push(descriptor);
+        }
+        
         format!(
-            "diff_{}_{:.1}_{:?}",
-            progression.len(),
+            "diff_[{}]_{:.1}_{:?}",
+            chord_descriptors.join(","),
             tempo_bpm.unwrap_or(120.0),
             time_signature.unwrap_or((4, 4))
         )

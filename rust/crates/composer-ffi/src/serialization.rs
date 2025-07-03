@@ -4,7 +4,7 @@ use crate::error::ToPyResult;
 use crate::{PyChord, PyScaleFingerprint};
 use composer_serialization::{
     augment_with_repeated, deserialize_chord, deserialize_trie, detokenize_cluster,
-    detokenize_midi_like, fast_hash, fold_hash, parse_duration_token, reconstruct_timeline,
+    detokenize_midi_like, fast_hash, fold_hash, parse_duration_token,
     reduce_chord_vocab, scale40_decode, scale40_encode, serialize_chord, serialize_trie,
     tokenize_chord_as_raw, tokenize_duration, validate_binary_format, validate_chord_cluster_token,
     validate_duration_token, validate_octave_token, validate_raw_note_token, validate_token,
@@ -210,15 +210,13 @@ impl PyTrieNode {
         }
     }
 
-    fn add_pattern(&mut self, pattern: Vec<&[u8]>, id: u32) -> PyResult<()> {
-        let pattern_vec: Vec<Vec<u8>> = pattern.into_iter().map(|p| p.to_vec()).collect();
-        self.inner.add_pattern(&pattern_vec, id);
+    fn add_pattern(&mut self, pattern: Vec<Vec<u8>>, id: u32) -> PyResult<()> {
+        self.inner.add_pattern(&pattern, id);
         Ok(())
     }
 
-    fn search_patterns(&self, pattern: Vec<&[u8]>) -> Vec<u32> {
-        let pattern_vec: Vec<Vec<u8>> = pattern.into_iter().map(|p| p.to_vec()).collect();
-        self.inner.search_patterns(&pattern_vec)
+    fn search_patterns(&self, pattern: Vec<Vec<u8>>) -> Vec<u32> {
+        self.inner.search_patterns(&pattern)
     }
 
     #[getter]
@@ -284,17 +282,17 @@ pub fn py_detokenize_cluster(
 
     let result = PyDict::new(py);
 
-    let py_chords: Vec<PyObject> = chords
+    let py_chords: Vec<PyChord> = chords
         .into_iter()
-        .map(|c| PyChord { inner: c }.into_py(py))
+        .map(|c| PyChord { inner: c })
         .collect();
-    result.set_item("chords", PyList::new(py, py_chords))?;
+    result.set_item("chords", PyList::new(py, py_chords)?)?;
 
-    let py_notes: Vec<PyObject> = notes
+    let py_notes: Vec<PyNote> = notes
         .into_iter()
-        .map(|n| PyNote { inner: n }.into_py(py))
+        .map(|n| PyNote { inner: n })
         .collect();
-    result.set_item("notes", PyList::new(py, py_notes))?;
+    result.set_item("notes", PyList::new(py, py_notes)?)?;
 
     result.set_item("duration", duration)?;
 
@@ -377,19 +375,18 @@ pub fn py_validate_binary_format(data: &[u8]) -> bool {
 /// Reduce chord vocabulary for ML optimization
 #[pyfunction]
 pub fn py_reduce_chord_vocab(
-    chords: Vec<&[u8]>,
+    chords: Vec<Vec<u8>>,
     max_vocab: usize,
     py: Python,
 ) -> PyResult<Py<PyList>> {
-    let chord_vecs: Vec<Vec<u8>> = chords.into_iter().map(|c| c.to_vec()).collect();
-    let reduced = reduce_chord_vocab(&chord_vecs, max_vocab).to_py_result()?;
+    let reduced = reduce_chord_vocab(&chords, max_vocab).to_py_result()?;
 
-    let py_chords: Vec<PyObject> = reduced
+    let py_chords: Vec<Bound<PyBytes>> = reduced
         .into_iter()
-        .map(|c| PyBytes::new(py, &c).into_py(py))
+        .map(|c| PyBytes::new(py, &c))
         .collect();
 
-    let list = PyList::new(py, py_chords);
+    let list = PyList::new(py, py_chords)?;
     Ok(list.into())
 }
 

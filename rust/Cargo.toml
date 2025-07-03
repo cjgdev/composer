@@ -56,8 +56,8 @@ wasm-bindgen-test = "0.3"
 getrandom = { version = "0.2", features = ["js"] }
 
 # Python specific  
-pyo3 = { version = "0.20", features = ["extension-module"] }
-pyo3-build-config = "0.20"
+pyo3 = { version = "0.25.1", features = ["extension-module"] }
+pyo3-build-config = "0.25.1"
 
 # Binary serialization
 rmp-serde = "1.1"

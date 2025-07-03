@@ -3,14 +3,13 @@
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList};
 use std::collections::HashMap;
-use std::sync::Arc;
 
 use crate::error::ToPyResult;
 use crate::{PyChord, PyScaleFingerprint};
 use composer_ai::{
     AiEngine, AiEngineConfig, BassHarmonization, BassHarmonizationOptions, BassStyle,
-    ChordProgressionSuggester, ChordProgressionTrie, ChordSuggestion, DifficultyAssessment,
-    MusicalAnalyzer, ProgressionAnalysis, SkillLevel, SuggestionConfig, SuggestionContext,
+    ChordSuggestion, DifficultyAssessment, ProgressionAnalysis, SkillLevel, SuggestionConfig,
+    SuggestionContext,
 };
 
 /// Python wrapper for SuggestionContext
@@ -278,7 +277,7 @@ impl PyProgressionAnalysis {
 
     #[getter]
     fn improvements(&self, py: Python) -> PyResult<Py<PyList>> {
-        let list = PyList::new(py, &self.inner.improvements);
+        let list = PyList::new(py, &self.inner.improvements)?;
         Ok(list.into())
     }
 
@@ -302,13 +301,13 @@ pub struct PyBassHarmonization {
 impl PyBassHarmonization {
     #[getter]
     fn bass_notes(&self, py: Python) -> PyResult<Py<PyList>> {
-        let list = PyList::new(py, &self.inner.bass_notes);
+        let list = PyList::new(py, &self.inner.bass_notes)?;
         Ok(list.into())
     }
 
     #[getter]
     fn rhythm(&self, py: Python) -> PyResult<Py<PyList>> {
-        let list = PyList::new(py, &self.inner.rhythm);
+        let list = PyList::new(py, &self.inner.rhythm)?;
         Ok(list.into())
     }
 
@@ -397,12 +396,12 @@ impl PyAiEngine {
             .get_chord_suggestions(&rust_pattern, &context.inner, &config.inner)
             .to_py_result()?;
 
-        let py_suggestions: Vec<PyObject> = suggestions
+        let py_suggestions: Vec<PyChordSuggestion> = suggestions
             .into_iter()
-            .map(|s| PyChordSuggestion { inner: s }.into_py(py))
+            .map(|s| PyChordSuggestion { inner: s })
             .collect();
 
-        let list = PyList::new(py, py_suggestions);
+        let list = PyList::new(py, py_suggestions)?;
         Ok(list.into())
     }
 
@@ -541,12 +540,12 @@ impl PyAiEngine {
             .get_magic_chord_solutions(&rust_previous, &rust_following, scale, limit)
             .to_py_result()?;
 
-        let py_suggestions: Vec<PyObject> = suggestions
+        let py_suggestions: Vec<PyChordSuggestion> = suggestions
             .into_iter()
-            .map(|s| PyChordSuggestion { inner: s }.into_py(py))
+            .map(|s| PyChordSuggestion { inner: s })
             .collect();
 
-        let list = PyList::new(py, py_suggestions);
+        let list = PyList::new(py, py_suggestions)?;
         Ok(list.into())
     }
 
@@ -564,12 +563,12 @@ impl PyAiEngine {
             .get_magic_bass_solutions(bass_note, scale, limit)
             .to_py_result()?;
 
-        let py_suggestions: Vec<PyObject> = suggestions
+        let py_suggestions: Vec<PyChordSuggestion> = suggestions
             .into_iter()
-            .map(|s| PyChordSuggestion { inner: s }.into_py(py))
+            .map(|s| PyChordSuggestion { inner: s })
             .collect();
 
-        let list = PyList::new(py, py_suggestions);
+        let list = PyList::new(py, py_suggestions)?;
         Ok(list.into())
     }
 
@@ -587,12 +586,12 @@ impl PyAiEngine {
             .get_harmonize_by_sd_solutions(scale_degree_bits, scale, limit)
             .to_py_result()?;
 
-        let py_suggestions: Vec<PyObject> = suggestions
+        let py_suggestions: Vec<PyChordSuggestion> = suggestions
             .into_iter()
-            .map(|s| PyChordSuggestion { inner: s }.into_py(py))
+            .map(|s| PyChordSuggestion { inner: s })
             .collect();
 
-        let list = PyList::new(py, py_suggestions);
+        let list = PyList::new(py, py_suggestions)?;
         Ok(list.into())
     }
 

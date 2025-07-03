@@ -30,4 +30,4 @@ smallvec.workspace = true
 proptest.workspace = true
 
 [build-dependencies]
-pyo3-build-config = "0.20"
+pyo3-build-config = "0.25.1"

@@ -191,7 +191,7 @@ fn test_performance_monitoring() {
     let suggester = ChordProgressionSuggester::new(trie);
 
     // Test suggestion generation time tracking
-    let initial_time = suggester.avg_suggestion_time_ms();
+    let _initial_time = suggester.avg_suggestion_time_ms();
 
     let _result = suggester.get_magic_chord_solutions(&[], &[], "major", 5);
 

@@ -53,6 +53,7 @@ pub struct ChordProgressionTrie {
     total_patterns: Arc<RwLock<u64>>,
 
     /// Memory usage tracking
+    #[allow(dead_code)]
     memory_usage_bytes: Arc<RwLock<u64>>,
 }
 

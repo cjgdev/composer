@@ -131,7 +131,7 @@ fn get_version() -> String {
 
 /// The main Composer module for Python
 #[pymodule]
-fn composer(_py: Python, m: &PyModule) -> PyResult<()> {
+fn composer(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Core data structures
     m.add_class::<PyChord>()?;
     m.add_class::<PyScaleFingerprint>()?;

@@ -370,8 +370,8 @@ impl Chord {
     /// - [`Chord::with_*`] - Builder methods that validate after each change
     /// - [`Chord::validate_alteration_compatibility`] - Internal validation helper
     pub fn validate(&self) -> ChordTheoryResult<()> {
-        // Validate root
-        if self.root > 7 {
+        // Validate root (allow chromatic roots up to 12)
+        if self.root > 12 {
             return Err(ChordTheoryError::InvalidChordRoot { root: self.root });
         }
 

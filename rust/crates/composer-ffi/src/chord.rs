@@ -205,25 +205,25 @@ impl PyChord {
 
     #[getter]
     fn adds(&self, py: Python) -> PyResult<Py<PyList>> {
-        let list = PyList::new(py, &self.inner.adds);
+        let list = PyList::new(py, &self.inner.adds)?;
         Ok(list.into())
     }
 
     #[getter]
     fn omits(&self, py: Python) -> PyResult<Py<PyList>> {
-        let list = PyList::new(py, &self.inner.omits);
+        let list = PyList::new(py, &self.inner.omits)?;
         Ok(list.into())
     }
 
     #[getter]
     fn alterations(&self, py: Python) -> PyResult<Py<PyList>> {
-        let list = PyList::new(py, &self.inner.alterations);
+        let list = PyList::new(py, &self.inner.alterations)?;
         Ok(list.into())
     }
 
     #[getter]
     fn suspensions(&self, py: Python) -> PyResult<Py<PyList>> {
-        let list = PyList::new(py, &self.inner.suspensions);
+        let list = PyList::new(py, &self.inner.suspensions)?;
         Ok(list.into())
     }
 

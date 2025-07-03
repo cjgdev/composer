@@ -59,7 +59,7 @@ impl PyScaleFingerprint {
     #[getter]
     fn scale_degrees(&self, py: Python) -> PyResult<Py<PyList>> {
         let degrees: Vec<u8> = self.inner.scale_degrees().into_iter().collect();
-        let list = PyList::new(py, degrees);
+        let list = PyList::new(py, degrees)?;
         Ok(list.into())
     }
 
@@ -67,7 +67,7 @@ impl PyScaleFingerprint {
     #[getter]
     fn chromatic_notes(&self, py: Python) -> PyResult<Py<PyList>> {
         let notes: Vec<u8> = self.inner.chromatic_notes().into_iter().collect();
-        let list = PyList::new(py, notes);
+        let list = PyList::new(py, notes)?;
         Ok(list.into())
     }
 

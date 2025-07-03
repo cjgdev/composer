@@ -130,7 +130,7 @@ fn test_bass_harmonization_edge_cases() {
     // Test edge cases
 
     // Empty scale name
-    let result = suggester.get_magic_bass_solutions("C", "", 5);
+    let _result = suggester.get_magic_bass_solutions("C", "", 5);
     // Should handle gracefully
 
     // Zero limit

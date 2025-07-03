@@ -1353,10 +1353,10 @@ impl ChordProgressionSuggester {
         };
 
         // Add complexity for modifications
-        let modification_complexity = (chord.alterations.len() as f64 * 0.5
+        let modification_complexity = chord.alterations.len() as f64 * 0.5
             + chord.suspensions.len() as f64 * 0.3
             + chord.adds.len() as f64 * 0.2
-            + chord.omits.len() as f64 * 0.4);
+            + chord.omits.len() as f64 * 0.4;
 
         let total_complexity = complexity + modification_complexity;
 
@@ -1445,9 +1445,9 @@ impl ChordProgressionSuggester {
         };
 
         // Penalty for complex alterations and modifications
-        let complexity_penalty = (chord.alterations.len() as f64 * 0.05
+        let complexity_penalty = chord.alterations.len() as f64 * 0.05
             + chord.suspensions.len() as f64 * 0.02
-            + chord.adds.len() as f64 * 0.02);
+            + chord.adds.len() as f64 * 0.02;
 
         // Special bonuses for very common chord types
         let special_bonus = match (chord.root, chord.chord_type) {

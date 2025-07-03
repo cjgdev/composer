@@ -431,20 +431,3 @@ class ComposerError(Exception):
 
 constants: dict[str, Any]
 __version__: str
-
-# Type Aliases (for backward compatibility)
-PyChord = Chord
-PyScaleFingerprint = ScaleFingerprint
-PyBorrowedScale = BorrowedScale
-PyAiEngine = AiEngine
-ChordGraphic = PyChordGraphic
-RelativeScaleDegrees = PyRelativeScaleDegrees
-PySuggestionContext = SuggestionContext
-PySuggestionConfig = SuggestionConfig
-PyChordSuggestion = ChordSuggestion
-PyDifficultyAssessment = DifficultyAssessment
-PyBassHarmonization = BassHarmonization
-PyNote = Note
-PyTokenLibrary = TokenLibrary
-PyTimeline = Timeline
-PyTrieNode = TrieNode

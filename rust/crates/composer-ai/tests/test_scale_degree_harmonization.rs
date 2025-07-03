@@ -237,8 +237,8 @@ fn test_scoring_formula_validation() {
         assert!(suggestion.weighted_score >= 0.0 && suggestion.weighted_score <= 1.0);
 
         // Final score should be reasonable combination of components
-        let expected_min = suggestion.frequency_score * 0.3; // Minimum if other factors are 0
-        let expected_max = (suggestion.frequency_score + suggestion.theory_score + 1.0) * 0.3 + 0.4;
+        let _expected_min = suggestion.frequency_score * 0.3; // Minimum if other factors are 0
+        let _expected_max = (suggestion.frequency_score + suggestion.theory_score + 1.0) * 0.3 + 0.4;
 
         assert!(
             suggestion.weighted_score >= 0.0,

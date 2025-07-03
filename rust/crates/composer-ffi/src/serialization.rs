@@ -4,9 +4,9 @@ use crate::error::ToPyResult;
 use crate::{PyChord, PyScaleFingerprint};
 use composer_serialization::{
     augment_with_repeated, deserialize_chord, deserialize_trie, detokenize_cluster,
-    detokenize_midi_like, fast_hash, fold_hash, parse_duration_token,
-    reduce_chord_vocab, scale40_decode, scale40_encode, serialize_chord, serialize_trie,
-    tokenize_chord_as_raw, tokenize_duration, validate_binary_format, validate_chord_cluster_token,
+    detokenize_midi_like, fast_hash, fold_hash, parse_duration_token, reduce_chord_vocab,
+    scale40_decode, scale40_encode, serialize_chord, serialize_trie, tokenize_chord_as_raw,
+    tokenize_duration, validate_binary_format, validate_chord_cluster_token,
     validate_duration_token, validate_octave_token, validate_raw_note_token, validate_token,
     ChordBinary, Note, Timeline, TokenLibrary, TrieNode, CHROMATIC_RANGE, OCTAVE_RANGE_MAX,
     OCTAVE_RANGE_MIN, TICKS_PER_BEAT,
@@ -282,16 +282,10 @@ pub fn py_detokenize_cluster(
 
     let result = PyDict::new(py);
 
-    let py_chords: Vec<PyChord> = chords
-        .into_iter()
-        .map(|c| PyChord { inner: c })
-        .collect();
+    let py_chords: Vec<PyChord> = chords.into_iter().map(|c| PyChord { inner: c }).collect();
     result.set_item("chords", PyList::new(py, py_chords)?)?;
 
-    let py_notes: Vec<PyNote> = notes
-        .into_iter()
-        .map(|n| PyNote { inner: n })
-        .collect();
+    let py_notes: Vec<PyNote> = notes.into_iter().map(|n| PyNote { inner: n }).collect();
     result.set_item("notes", PyList::new(py, py_notes)?)?;
 
     result.set_item("duration", duration)?;
@@ -381,10 +375,8 @@ pub fn py_reduce_chord_vocab(
 ) -> PyResult<Py<PyList>> {
     let reduced = reduce_chord_vocab(&chords, max_vocab).to_py_result()?;
 
-    let py_chords: Vec<Bound<PyBytes>> = reduced
-        .into_iter()
-        .map(|c| PyBytes::new(py, &c))
-        .collect();
+    let py_chords: Vec<Bound<PyBytes>> =
+        reduced.into_iter().map(|c| PyBytes::new(py, &c)).collect();
 
     let list = PyList::new(py, py_chords)?;
     Ok(list.into())

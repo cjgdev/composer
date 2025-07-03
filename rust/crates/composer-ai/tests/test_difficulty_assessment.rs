@@ -401,9 +401,12 @@ fn test_skill_level_differentiation_regression() {
     ];
 
     // Test each progression
-    let beginner_result = analyzer.assess_difficulty(&beginner_progression, Some(120.0), Some((4, 4)));
-    let intermediate_result = analyzer.assess_difficulty(&intermediate_progression, Some(120.0), Some((4, 4)));
-    let advanced_result = analyzer.assess_difficulty(&advanced_progression, Some(140.0), Some((4, 4)));
+    let beginner_result =
+        analyzer.assess_difficulty(&beginner_progression, Some(120.0), Some((4, 4)));
+    let intermediate_result =
+        analyzer.assess_difficulty(&intermediate_progression, Some(120.0), Some((4, 4)));
+    let advanced_result =
+        analyzer.assess_difficulty(&advanced_progression, Some(140.0), Some((4, 4)));
     let expert_result = analyzer.assess_difficulty(&expert_progression, Some(180.0), Some((7, 8)));
 
     assert!(beginner_result.is_ok());
@@ -418,23 +421,46 @@ fn test_skill_level_differentiation_regression() {
 
     // Debug output to understand the scoring
     println!("🔍 Debug: Complexity component breakdown:");
-    println!("  Beginner - H:{:.2} R:{:.2} T:{:.2} M:{:.2} = {:.2} ({})", 
-        beginner_assessment.harmonic_complexity, beginner_assessment.rhythmic_complexity,
-        beginner_assessment.technical_complexity, beginner_assessment.melodic_complexity,
-        beginner_assessment.overall_score, format!("{:?}", beginner_assessment.skill_level));
-    println!("    Factors: unique={}, avg_complexity={:.2}, extended={}", 
-        beginner_assessment.factors.unique_chords, beginner_assessment.factors.avg_chord_complexity, beginner_assessment.factors.extended_harmonies);
-    println!("  Intermediate - H:{:.2} R:{:.2} T:{:.2} M:{:.2} = {:.2} ({})", 
-        intermediate_assessment.harmonic_complexity, intermediate_assessment.rhythmic_complexity,
-        intermediate_assessment.technical_complexity, intermediate_assessment.melodic_complexity,
-        intermediate_assessment.overall_score, format!("{:?}", intermediate_assessment.skill_level));
-    println!("    Factors: unique={}, avg_complexity={:.2}, extended={}", 
-        intermediate_assessment.factors.unique_chords, intermediate_assessment.factors.avg_chord_complexity, intermediate_assessment.factors.extended_harmonies);
-    
+    println!(
+        "  Beginner - H:{:.2} R:{:.2} T:{:.2} M:{:.2} = {:.2} ({})",
+        beginner_assessment.harmonic_complexity,
+        beginner_assessment.rhythmic_complexity,
+        beginner_assessment.technical_complexity,
+        beginner_assessment.melodic_complexity,
+        beginner_assessment.overall_score,
+        format!("{:?}", beginner_assessment.skill_level)
+    );
+    println!(
+        "    Factors: unique={}, avg_complexity={:.2}, extended={}",
+        beginner_assessment.factors.unique_chords,
+        beginner_assessment.factors.avg_chord_complexity,
+        beginner_assessment.factors.extended_harmonies
+    );
+    println!(
+        "  Intermediate - H:{:.2} R:{:.2} T:{:.2} M:{:.2} = {:.2} ({})",
+        intermediate_assessment.harmonic_complexity,
+        intermediate_assessment.rhythmic_complexity,
+        intermediate_assessment.technical_complexity,
+        intermediate_assessment.melodic_complexity,
+        intermediate_assessment.overall_score,
+        format!("{:?}", intermediate_assessment.skill_level)
+    );
+    println!(
+        "    Factors: unique={}, avg_complexity={:.2}, extended={}",
+        intermediate_assessment.factors.unique_chords,
+        intermediate_assessment.factors.avg_chord_complexity,
+        intermediate_assessment.factors.extended_harmonies
+    );
+
     // Debug the chord types
-    println!("  Intermediate chord types: {:?}", 
-        intermediate_progression.iter().map(|c| c.chord_type).collect::<Vec<_>>());
-    
+    println!(
+        "  Intermediate chord types: {:?}",
+        intermediate_progression
+            .iter()
+            .map(|c| c.chord_type)
+            .collect::<Vec<_>>()
+    );
+
     // The main goal is to ensure scores are not all maxed at 10.0 (the original bug)
     assert!(
         beginner_assessment.overall_score < 10.0,
@@ -471,7 +497,6 @@ fn test_skill_level_differentiation_regression() {
         expert_assessment.overall_score
     );
 
-
     // Check harmonic complexity doesn't decrease inappropriately
     assert!(
         beginner_assessment.harmonic_complexity <= intermediate_assessment.harmonic_complexity + 0.1,
@@ -489,28 +514,64 @@ fn test_skill_level_differentiation_regression() {
 
     // Debug output to understand the scoring
     println!("🔍 Debug: Complexity component breakdown:");
-    println!("  Beginner - H:{:.2} R:{:.2} T:{:.2} M:{:.2} = {:.2} ({})", 
-        beginner_assessment.harmonic_complexity, beginner_assessment.rhythmic_complexity,
-        beginner_assessment.technical_complexity, beginner_assessment.melodic_complexity,
-        beginner_assessment.overall_score, format!("{:?}", beginner_assessment.skill_level));
-    println!("  Intermediate - H:{:.2} R:{:.2} T:{:.2} M:{:.2} = {:.2} ({})", 
-        intermediate_assessment.harmonic_complexity, intermediate_assessment.rhythmic_complexity,
-        intermediate_assessment.technical_complexity, intermediate_assessment.melodic_complexity,
-        intermediate_assessment.overall_score, format!("{:?}", intermediate_assessment.skill_level));
-    println!("  Advanced - H:{:.2} R:{:.2} T:{:.2} M:{:.2} = {:.2} ({})", 
-        advanced_assessment.harmonic_complexity, advanced_assessment.rhythmic_complexity,
-        advanced_assessment.technical_complexity, advanced_assessment.melodic_complexity,
-        advanced_assessment.overall_score, format!("{:?}", advanced_assessment.skill_level));
-    println!("  Expert - H:{:.2} R:{:.2} T:{:.2} M:{:.2} = {:.2} ({})", 
-        expert_assessment.harmonic_complexity, expert_assessment.rhythmic_complexity,
-        expert_assessment.technical_complexity, expert_assessment.melodic_complexity,
-        expert_assessment.overall_score, format!("{:?}", expert_assessment.skill_level));
+    println!(
+        "  Beginner - H:{:.2} R:{:.2} T:{:.2} M:{:.2} = {:.2} ({})",
+        beginner_assessment.harmonic_complexity,
+        beginner_assessment.rhythmic_complexity,
+        beginner_assessment.technical_complexity,
+        beginner_assessment.melodic_complexity,
+        beginner_assessment.overall_score,
+        format!("{:?}", beginner_assessment.skill_level)
+    );
+    println!(
+        "  Intermediate - H:{:.2} R:{:.2} T:{:.2} M:{:.2} = {:.2} ({})",
+        intermediate_assessment.harmonic_complexity,
+        intermediate_assessment.rhythmic_complexity,
+        intermediate_assessment.technical_complexity,
+        intermediate_assessment.melodic_complexity,
+        intermediate_assessment.overall_score,
+        format!("{:?}", intermediate_assessment.skill_level)
+    );
+    println!(
+        "  Advanced - H:{:.2} R:{:.2} T:{:.2} M:{:.2} = {:.2} ({})",
+        advanced_assessment.harmonic_complexity,
+        advanced_assessment.rhythmic_complexity,
+        advanced_assessment.technical_complexity,
+        advanced_assessment.melodic_complexity,
+        advanced_assessment.overall_score,
+        format!("{:?}", advanced_assessment.skill_level)
+    );
+    println!(
+        "  Expert - H:{:.2} R:{:.2} T:{:.2} M:{:.2} = {:.2} ({})",
+        expert_assessment.harmonic_complexity,
+        expert_assessment.rhythmic_complexity,
+        expert_assessment.technical_complexity,
+        expert_assessment.melodic_complexity,
+        expert_assessment.overall_score,
+        format!("{:?}", expert_assessment.skill_level)
+    );
 
     println!("✅ Skill level differentiation test passed:");
-    println!("  Beginner: {:.2} ({})", beginner_assessment.overall_score, format!("{:?}", beginner_assessment.skill_level));
-    println!("  Intermediate: {:.2} ({})", intermediate_assessment.overall_score, format!("{:?}", intermediate_assessment.skill_level));
-    println!("  Advanced: {:.2} ({})", advanced_assessment.overall_score, format!("{:?}", advanced_assessment.skill_level));
-    println!("  Expert: {:.2} ({})", expert_assessment.overall_score, format!("{:?}", expert_assessment.skill_level));
+    println!(
+        "  Beginner: {:.2} ({})",
+        beginner_assessment.overall_score,
+        format!("{:?}", beginner_assessment.skill_level)
+    );
+    println!(
+        "  Intermediate: {:.2} ({})",
+        intermediate_assessment.overall_score,
+        format!("{:?}", intermediate_assessment.skill_level)
+    );
+    println!(
+        "  Advanced: {:.2} ({})",
+        advanced_assessment.overall_score,
+        format!("{:?}", advanced_assessment.skill_level)
+    );
+    println!(
+        "  Expert: {:.2} ({})",
+        expert_assessment.overall_score,
+        format!("{:?}", expert_assessment.skill_level)
+    );
 }
 
 #[test]
@@ -550,7 +611,8 @@ fn test_famous_progressions_classification() {
     ];
 
     let let_it_be_result = analyzer.assess_difficulty(&let_it_be, Some(75.0), Some((4, 4)));
-    let autumn_leaves_result = analyzer.assess_difficulty(&autumn_leaves, Some(120.0), Some((4, 4)));
+    let autumn_leaves_result =
+        analyzer.assess_difficulty(&autumn_leaves, Some(120.0), Some((4, 4)));
     let giant_steps_result = analyzer.assess_difficulty(&giant_steps, Some(290.0), Some((4, 4)));
 
     assert!(let_it_be_result.is_ok());
@@ -560,7 +622,6 @@ fn test_famous_progressions_classification() {
     let let_it_be_assessment = let_it_be_result.unwrap();
     let autumn_leaves_assessment = autumn_leaves_result.unwrap();
     let giant_steps_assessment = giant_steps_result.unwrap();
-
 
     // Let It Be should be the easiest
     assert!(
@@ -587,9 +648,21 @@ fn test_famous_progressions_classification() {
     );
 
     println!("✅ Famous progressions classification test passed:");
-    println!("  Let It Be: {:.2} ({})", let_it_be_assessment.overall_score, format!("{:?}", let_it_be_assessment.skill_level));
-    println!("  Autumn Leaves: {:.2} ({})", autumn_leaves_assessment.overall_score, format!("{:?}", autumn_leaves_assessment.skill_level));
-    println!("  Giant Steps: {:.2} ({})", giant_steps_assessment.overall_score, format!("{:?}", giant_steps_assessment.skill_level));
+    println!(
+        "  Let It Be: {:.2} ({})",
+        let_it_be_assessment.overall_score,
+        format!("{:?}", let_it_be_assessment.skill_level)
+    );
+    println!(
+        "  Autumn Leaves: {:.2} ({})",
+        autumn_leaves_assessment.overall_score,
+        format!("{:?}", autumn_leaves_assessment.skill_level)
+    );
+    println!(
+        "  Giant Steps: {:.2} ({})",
+        giant_steps_assessment.overall_score,
+        format!("{:?}", giant_steps_assessment.skill_level)
+    );
 }
 
 #[test]
@@ -609,9 +682,18 @@ fn test_individual_chord_complexity_scoring() {
     let thirteenth_complexity = analyzer.calculate_single_chord_complexity(&thirteenth);
 
     // Verify increasing complexity order
-    assert!(triad_complexity < seventh_complexity, "Triad should be simpler than seventh");
-    assert!(seventh_complexity < ninth_complexity, "Seventh should be simpler than ninth");
-    assert!(ninth_complexity < thirteenth_complexity, "Ninth should be simpler than thirteenth");
+    assert!(
+        triad_complexity < seventh_complexity,
+        "Triad should be simpler than seventh"
+    );
+    assert!(
+        seventh_complexity < ninth_complexity,
+        "Seventh should be simpler than ninth"
+    );
+    assert!(
+        ninth_complexity < thirteenth_complexity,
+        "Ninth should be simpler than thirteenth"
+    );
 
     // Test alteration complexity
     let mut altered_chord = Chord::new(1, 7).unwrap();
@@ -619,7 +701,10 @@ fn test_individual_chord_complexity_scoring() {
     altered_chord.alterations.push("b9".to_string()); // Standard alteration
 
     let altered_complexity = analyzer.calculate_single_chord_complexity(&altered_chord);
-    assert!(altered_complexity > seventh_complexity, "Altered chord should be more complex");
+    assert!(
+        altered_complexity > seventh_complexity,
+        "Altered chord should be more complex"
+    );
 
     println!("✅ Individual chord complexity test passed:");
     println!("  I: {:.2}", triad_complexity);
@@ -633,7 +718,7 @@ fn test_individual_chord_complexity_scoring() {
 fn test_harmonic_complexity_components() {
     let trie = Arc::new(ChordProgressionTrie::new());
     let analyzer = MusicalAnalyzer::new(trie);
-    
+
     // Clear any cached results to ensure fresh calculations
     analyzer.clear_cache();
 
@@ -654,26 +739,48 @@ fn test_harmonic_complexity_components() {
     ];
 
     let simple_result = analyzer.assess_difficulty(&simple_progression, Some(120.0), Some((4, 4)));
-    let complex_result = analyzer.assess_difficulty(&complex_progression, Some(120.0), Some((4, 4)));
+    let complex_result =
+        analyzer.assess_difficulty(&complex_progression, Some(120.0), Some((4, 4)));
 
     assert!(simple_result.is_ok());
     assert!(complex_result.is_ok());
 
     let simple_assessment = simple_result.unwrap();
     let complex_assessment = complex_result.unwrap();
-    
+
     // Debug output
-    println!("Simple progression harmonic complexity: {:.2}", simple_assessment.harmonic_complexity);
-    println!("Complex progression harmonic complexity: {:.2}", complex_assessment.harmonic_complexity);
-    println!("Simple extended harmonies: {}", simple_assessment.factors.extended_harmonies);
-    println!("Complex extended harmonies: {}", complex_assessment.factors.extended_harmonies);
-    println!("Simple avg chord complexity: {:.2}", simple_assessment.factors.avg_chord_complexity);
-    println!("Complex avg chord complexity: {:.2}", complex_assessment.factors.avg_chord_complexity);
-    
+    println!(
+        "Simple progression harmonic complexity: {:.2}",
+        simple_assessment.harmonic_complexity
+    );
+    println!(
+        "Complex progression harmonic complexity: {:.2}",
+        complex_assessment.harmonic_complexity
+    );
+    println!(
+        "Simple extended harmonies: {}",
+        simple_assessment.factors.extended_harmonies
+    );
+    println!(
+        "Complex extended harmonies: {}",
+        complex_assessment.factors.extended_harmonies
+    );
+    println!(
+        "Simple avg chord complexity: {:.2}",
+        simple_assessment.factors.avg_chord_complexity
+    );
+    println!(
+        "Complex avg chord complexity: {:.2}",
+        complex_assessment.factors.avg_chord_complexity
+    );
+
     // Test individual chord complexities
     for (i, chord) in complex_progression.iter().enumerate() {
         let complexity = analyzer.calculate_single_chord_complexity(chord);
-        println!("Complex chord {} (type {}): complexity {:.2}", i, chord.chord_type, complexity);
+        println!(
+            "Complex chord {} (type {}): complexity {:.2}",
+            i, chord.chord_type, complexity
+        );
     }
 
     // Complex progression should have higher harmonic complexity
@@ -685,12 +792,24 @@ fn test_harmonic_complexity_components() {
     );
 
     // Check extended harmonies detection
-    assert_eq!(simple_assessment.factors.extended_harmonies, 0, "Simple progression should have no extended harmonies");
-    assert!(complex_assessment.factors.extended_harmonies > 0, "Complex progression should have extended harmonies");
+    assert_eq!(
+        simple_assessment.factors.extended_harmonies, 0,
+        "Simple progression should have no extended harmonies"
+    );
+    assert!(
+        complex_assessment.factors.extended_harmonies > 0,
+        "Complex progression should have extended harmonies"
+    );
 
     println!("✅ Harmonic complexity components test passed:");
-    println!("  Simple I-IV-V-I: {:.2} harmonic complexity", simple_assessment.harmonic_complexity);
-    println!("  Complex extended: {:.2} harmonic complexity", complex_assessment.harmonic_complexity);
+    println!(
+        "  Simple I-IV-V-I: {:.2} harmonic complexity",
+        simple_assessment.harmonic_complexity
+    );
+    println!(
+        "  Complex extended: {:.2} harmonic complexity",
+        complex_assessment.harmonic_complexity
+    );
 }
 
 #[test]
@@ -714,8 +833,10 @@ fn test_melodic_complexity_interval_analysis() {
         Chord::new(7, 5).unwrap(), // B (large interval from E)
     ];
 
-    let stepwise_result = analyzer.assess_difficulty(&stepwise_progression, Some(120.0), Some((4, 4)));
-    let large_interval_result = analyzer.assess_difficulty(&large_interval_progression, Some(120.0), Some((4, 4)));
+    let stepwise_result =
+        analyzer.assess_difficulty(&stepwise_progression, Some(120.0), Some((4, 4)));
+    let large_interval_result =
+        analyzer.assess_difficulty(&large_interval_progression, Some(120.0), Some((4, 4)));
 
     assert!(stepwise_result.is_ok());
     assert!(large_interval_result.is_ok());
@@ -732,8 +853,14 @@ fn test_melodic_complexity_interval_analysis() {
     );
 
     println!("✅ Melodic complexity interval analysis test passed:");
-    println!("  Step-wise: {:.2} melodic complexity", stepwise_assessment.melodic_complexity);
-    println!("  Large intervals: {:.2} melodic complexity", large_interval_assessment.melodic_complexity);
+    println!(
+        "  Step-wise: {:.2} melodic complexity",
+        stepwise_assessment.melodic_complexity
+    );
+    println!(
+        "  Large intervals: {:.2} melodic complexity",
+        large_interval_assessment.melodic_complexity
+    );
 }
 
 #[test]
@@ -772,9 +899,18 @@ fn test_rhythmic_complexity_tempo_impact() {
     );
 
     println!("✅ Rhythmic complexity tempo impact test passed:");
-    println!("  Slow (80 BPM): {:.2} rhythmic complexity", slow_assessment.rhythmic_complexity);
-    println!("  Medium (120 BPM): {:.2} rhythmic complexity", medium_assessment.rhythmic_complexity);
-    println!("  Fast (180 BPM): {:.2} rhythmic complexity", fast_assessment.rhythmic_complexity);
+    println!(
+        "  Slow (80 BPM): {:.2} rhythmic complexity",
+        slow_assessment.rhythmic_complexity
+    );
+    println!(
+        "  Medium (120 BPM): {:.2} rhythmic complexity",
+        medium_assessment.rhythmic_complexity
+    );
+    println!(
+        "  Fast (180 BPM): {:.2} rhythmic complexity",
+        fast_assessment.rhythmic_complexity
+    );
 }
 
 #[test]
@@ -800,14 +936,14 @@ fn test_technical_complexity_voice_leading() {
     let complex_progression = vec![complex_chord_1, complex_chord_2, complex_chord_3];
 
     let smooth_result = analyzer.assess_difficulty(&smooth_progression, Some(120.0), Some((4, 4)));
-    let complex_result = analyzer.assess_difficulty(&complex_progression, Some(120.0), Some((4, 4)));
+    let complex_result =
+        analyzer.assess_difficulty(&complex_progression, Some(120.0), Some((4, 4)));
 
     assert!(smooth_result.is_ok());
     assert!(complex_result.is_ok());
 
     let smooth_assessment = smooth_result.unwrap();
     let complex_assessment = complex_result.unwrap();
-
 
     // Complex voice leading should increase technical complexity
     assert!(
@@ -818,8 +954,14 @@ fn test_technical_complexity_voice_leading() {
     );
 
     println!("✅ Technical complexity voice leading test passed:");
-    println!("  Smooth: {:.2} technical complexity", smooth_assessment.technical_complexity);
-    println!("  Complex: {:.2} technical complexity", complex_assessment.technical_complexity);
+    println!(
+        "  Smooth: {:.2} technical complexity",
+        smooth_assessment.technical_complexity
+    );
+    println!(
+        "  Complex: {:.2} technical complexity",
+        complex_assessment.technical_complexity
+    );
 }
 
 #[test]
@@ -840,11 +982,10 @@ fn test_polynomial_model_application() {
     let assessment = result.unwrap();
 
     // Verify polynomial model coefficients are applied correctly
-    let expected_weighted_input = 
-        assessment.harmonic_complexity * 0.35 +
-        assessment.rhythmic_complexity * 0.25 +
-        assessment.technical_complexity * 0.25 +
-        assessment.melodic_complexity * 0.15;
+    let expected_weighted_input = assessment.harmonic_complexity * 0.35
+        + assessment.rhythmic_complexity * 0.25
+        + assessment.technical_complexity * 0.25
+        + assessment.melodic_complexity * 0.15;
 
     // Apply the polynomial model manually
     let x = expected_weighted_input / 10.0;

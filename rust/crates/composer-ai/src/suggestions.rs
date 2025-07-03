@@ -640,7 +640,7 @@ impl ChordProgressionSuggester {
 
         // Adjust for chord root (tonic works well at start/end)
         let root_adjustment: f64 = if chord.root == 1 {
-            if position < 0.2 || position > 0.8 {
+            if !(0.2..=0.8).contains(&position) {
                 0.2 // Bonus for tonic at beginning/end
             } else {
                 0.0
@@ -1377,7 +1377,7 @@ impl ChordProgressionSuggester {
 
         let additional_notes = chord.adds.len() + chord.suspensions.len() - chord.omits.len(); // Omissions reduce note count
 
-        let total_notes = (base_notes as i32 + additional_notes as i32).max(1) as usize;
+        let total_notes = (base_notes + additional_notes as i32).max(1) as usize;
 
         // Score based on note count (penalize excessive notes)
         match total_notes {
@@ -1538,12 +1538,12 @@ mod tests {
         };
 
         let frequency_score = suggester.calculate_frequency_score(&pattern_result);
-        assert!(frequency_score >= 0.0 && frequency_score <= 1.0);
+        assert!((0.0..=1.0).contains(&frequency_score));
 
         let context = SuggestionContext::default();
         let chord = Chord::new(1, 5).unwrap();
         let context_score = suggester.calculate_context_score(&chord, &context);
-        assert!(context_score >= 0.0 && context_score <= 1.0);
+        assert!((0.0..=1.0).contains(&context_score));
     }
 
     #[test]
@@ -1566,7 +1566,7 @@ mod tests {
         let config = SuggestionConfig::default();
 
         let score = suggester.calculate_weighted_score(0.8, 0.6, 0.7, &config);
-        assert!(score >= 0.0 && score <= 1.0);
+        assert!((0.0..=1.0).contains(&score));
     }
 
     #[test]
@@ -1584,6 +1584,6 @@ mod tests {
         };
 
         let confidence = suggester.calculate_confidence(0.7, &pattern_result);
-        assert!(confidence >= 0.0 && confidence <= 1.0);
+        assert!((0.0..=1.0).contains(&confidence));
     }
 }

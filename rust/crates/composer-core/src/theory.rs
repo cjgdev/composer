@@ -416,7 +416,7 @@ pub fn get_chord_complexity(chord: &Chord, _scale_name: &str) -> ChordTheoryResu
     complexity += chord.omits.len() as f64 * 0.4;
 
     // Clamp to 0-10 range
-    Ok(complexity.min(10.0).max(0.0))
+    Ok(complexity.clamp(0.0, 10.0))
 }
 
 /// Validate tritone substitution eligibility

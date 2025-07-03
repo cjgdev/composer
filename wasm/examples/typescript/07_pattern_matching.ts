@@ -44,7 +44,7 @@ function demonstrateTriePatternStorage(): void {
   // Simulate trie functionality
   console.log("Simulating trie for storing chord progressions");
 
-  let stats = {
+  const stats = {
     totalPatterns: 0,
     totalNodes: 1,
     memoryUsageBytes: 256,

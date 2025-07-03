@@ -479,7 +479,7 @@ impl Chord {
     }
 
     /// Builder pattern methods
-
+    ///
     /// Sets the inversion level of the chord.
     ///
     /// Inversions change which chord tone appears in the bass, creating different
@@ -638,7 +638,7 @@ impl Chord {
     }
 
     /// Query methods
-
+    ///
     /// Checks if this is a basic triad (three-note chord).
     ///
     /// Triads are the fundamental building blocks of harmony, consisting of

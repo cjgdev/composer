@@ -98,19 +98,14 @@ pub struct BassHarmonizationOptions {
 }
 
 /// Bass line style options
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, Default)]
 pub enum BassStyle {
-    Root,        // Root notes only
+    #[default]
+    Root, // Root notes only
     Alternating, // Alternating bass
     Walking,     // Walking bass line
     Arpeggiated, // Arpeggiated patterns
     Rhythmic,    // Rhythmic bass patterns
-}
-
-impl Default for BassStyle {
-    fn default() -> Self {
-        BassStyle::Root
-    }
 }
 
 impl Default for BassHarmonizationOptions {
@@ -830,7 +825,7 @@ impl AiEngine {
         let limit_mb = self.config.read().max_memory_mb;
 
         if current_usage_mb > limit_mb as u64 {
-            return Err(AiError::MemoryExhausted { limit_mb: limit_mb });
+            return Err(AiError::MemoryExhausted { limit_mb });
         }
 
         Ok(())

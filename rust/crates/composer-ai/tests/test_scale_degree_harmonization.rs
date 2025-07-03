@@ -238,7 +238,8 @@ fn test_scoring_formula_validation() {
 
         // Final score should be reasonable combination of components
         let _expected_min = suggestion.frequency_score * 0.3; // Minimum if other factors are 0
-        let _expected_max = (suggestion.frequency_score + suggestion.theory_score + 1.0) * 0.3 + 0.4;
+        let _expected_max =
+            (suggestion.frequency_score + suggestion.theory_score + 1.0) * 0.3 + 0.4;
 
         assert!(
             suggestion.weighted_score >= 0.0,
@@ -261,7 +262,7 @@ fn test_bits_to_scale_degrees_conversion() {
     let degrees = suggester.bits_to_scale_degrees(bits);
 
     // Should convert bits to 1-based scale degrees
-    let expected_degrees = vec![1, 3, 5, 7, 9, 11, 13]; // 1-based degrees for set bits
+    let expected_degrees = [1, 3, 5, 7, 9, 11, 13]; // 1-based degrees for set bits
     assert_eq!(degrees.len(), expected_degrees.len());
 
     for (i, &degree) in degrees.iter().enumerate() {

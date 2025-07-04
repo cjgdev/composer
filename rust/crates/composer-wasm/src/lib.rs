@@ -3,9 +3,7 @@
 //! This crate provides WASM bindings that allow the Composer library to be used
 //! from JavaScript in web browsers and Node.js environments.
 
-use composer_ai::{
-    AiEngine, AiEngineConfig, ChordProgressionTrie, ChordSuggestion, DifficultyAssessment,
-};
+use composer_ai::{AiEngine, AiEngineConfig, ChordProgressionTrie, ChordSuggestion};
 use composer_core::{
     get_chord_complexity, get_relative_chord_graphic, get_stable_scale_degrees, Chord,
     ScaleFingerprint,
@@ -985,11 +983,6 @@ pub fn is_isotonal(
 extern "C" {
     #[wasm_bindgen(js_namespace = console)]
     fn log(s: &str);
-}
-
-/// Macro for console.log
-macro_rules! console_log {
-    ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
 }
 
 #[cfg(test)]

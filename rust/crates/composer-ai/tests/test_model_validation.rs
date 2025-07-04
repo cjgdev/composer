@@ -285,11 +285,11 @@ fn test_model_saturation_prevention() {
         // Very complex
         vec![
             Chord::new(1, 13).unwrap(),
-            Chord::new(8, 11).unwrap(),
+            Chord::new(7, 11).unwrap(),
             Chord::new(3, 13).unwrap(),
-            Chord::new(10, 9).unwrap(),
+            Chord::new(2, 9).unwrap(),
             Chord::new(6, 13).unwrap(),
-            Chord::new(11, 11).unwrap(),
+            Chord::new(4, 11).unwrap(),
         ],
     ];
 

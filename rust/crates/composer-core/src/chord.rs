@@ -370,11 +370,6 @@ impl Chord {
     /// - [`Chord::with_*`] - Builder methods that validate after each change
     /// - [`Chord::validate_alteration_compatibility`] - Internal validation helper
     pub fn validate(&self) -> ChordTheoryResult<()> {
-        // Validate root (allow chromatic roots up to 12)
-        if self.root > 12 {
-            return Err(ChordTheoryError::InvalidChordRoot { root: self.root });
-        }
-
         // Rest chords can skip other validations
         if self.is_rest {
             if self.root != 0 {
@@ -384,7 +379,7 @@ impl Chord {
         }
 
         // Non-rest chords must have valid root (1-7)
-        if self.root == 0 {
+        if self.root == 0 || self.root > MUSICAL.scale_degrees {
             return Err(ChordTheoryError::InvalidChordRoot { root: self.root });
         }
 

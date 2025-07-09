@@ -303,8 +303,8 @@ impl MusicalAnalyzer {
     fn calculate_complexity_factors(
         &self,
         progression: &[Chord],
-        tempo_bpm: Option<f64>,
-        time_signature: Option<(u8, u8)>,
+        _tempo_bpm: Option<f64>,
+        _time_signature: Option<(u8, u8)>,
     ) -> AiResult<ComplexityFactors> {
         // Count unique chords
         // Count unique chords by serializing them
@@ -330,7 +330,7 @@ impl MusicalAnalyzer {
         let uncommon_progressions = self.count_uncommon_progressions(progression)?;
 
         // Time signature changes (0 if not provided)
-        let time_signature_changes = if time_signature.is_some() { 0 } else { 0 };
+        let time_signature_changes = 0;
 
         // Count extended harmonies
         let extended_harmonies = progression
@@ -342,7 +342,7 @@ impl MusicalAnalyzer {
         let voice_leading_complexity = self.calculate_voice_leading_complexity(progression);
 
         // Tempo variations (simplified)
-        let tempo_variations = if tempo_bpm.is_some() { 0.0 } else { 0.0 };
+        let tempo_variations = 0.0;
 
         Ok(ComplexityFactors {
             unique_chords,
@@ -534,7 +534,7 @@ impl MusicalAnalyzer {
         let polynomial_result = a * x.powi(3) + b * x.powi(2) + c * x + d;
 
         // Scale back to 0-10 range and clamp
-        (polynomial_result * 10.0).max(0.0).min(10.0) // Scale to 0-10 range
+        (polynomial_result * 10.0).clamp(0.0, 10.0) // Scale to 0-10 range
     }
 
     /// Classify skill level based on difficulty score
@@ -565,7 +565,7 @@ impl MusicalAnalyzer {
             confidence *= 0.9;
         }
 
-        confidence.max(0.0).min(1.0)
+        confidence.clamp(0.0, 1.0)
     }
 
     /// Helper methods for complexity calculation

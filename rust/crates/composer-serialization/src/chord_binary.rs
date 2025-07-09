@@ -231,7 +231,11 @@ pub fn serialize_chord(chord: &Chord) -> SerializationResult<ChordBinary> {
 /// assert_eq!(complex_chord.chord_type, restored.chord_type);
 /// assert_eq!(complex_chord.inversion, restored.inversion);
 /// assert_eq!(complex_chord.applied, restored.applied);
-/// assert_eq!(complex_chord.alterations, restored.alterations);
+/// // Alterations may be in different order due to bit-based encoding
+/// assert_eq!(complex_chord.alterations.len(), restored.alterations.len());
+/// for alt in &complex_chord.alterations {
+///     assert!(restored.alterations.contains(alt));
+/// }
 /// assert_eq!(complex_chord.suspensions, restored.suspensions);
 /// assert_eq!(complex_chord.adds, restored.adds);
 /// assert_eq!(complex_chord.omits, restored.omits);

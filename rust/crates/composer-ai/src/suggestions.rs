@@ -401,7 +401,7 @@ impl ChordProgressionSuggester {
             score += self.calculate_genre_score(chord, &context.genre_weights) * 0.2;
         }
 
-        score.max(0.0).min(1.0)
+        score.clamp(0.0, 1.0)
     }
 
     /// Calculate theoretical appropriateness score
@@ -424,7 +424,7 @@ impl ChordProgressionSuggester {
         // Resolution tendency analysis
         score += self.calculate_resolution_score(chord, pattern) * 0.3;
 
-        score.max(0.0).min(1.0)
+        score.clamp(0.0, 1.0)
     }
 
     /// Calculate final weighted score combining all factors
@@ -608,7 +608,7 @@ impl ChordProgressionSuggester {
                     .count() as f64
                     * 0.1;
 
-                (compatibility_base - chromatic_penalty).max(0.0).min(1.0)
+                (compatibility_base - chromatic_penalty).clamp(0.0, 1.0)
             },
             Err(_) => 0.3, // Default moderate compatibility if analysis fails
         }
@@ -678,7 +678,7 @@ impl ChordProgressionSuggester {
 
         // Adjust for alterations (generally more dissonant)
         let alteration_adjustment = -0.1 * chord.alterations.len() as f64;
-        let final_valence = (chord_valence + alteration_adjustment).max(-1.0).min(1.0);
+        let final_valence = (chord_valence + alteration_adjustment).clamp(-1.0, 1.0);
 
         // Score based on how close to target valence
         let distance = (final_valence - target_valence).abs();
@@ -773,7 +773,7 @@ impl ChordProgressionSuggester {
         }
 
         if total_weight > 0.0 {
-            (total_score / total_weight).max(0.0).min(1.0)
+            (total_score / total_weight).clamp(0.0, 1.0)
         } else {
             0.5 // Neutral if no genre weights
         }
@@ -866,9 +866,7 @@ impl ChordProgressionSuggester {
             _ => 0.0,
         };
 
-        (function_strength + context_bonus + type_bonus)
-            .max(0.0_f64)
-            .min(1.0_f64)
+        (function_strength + context_bonus + type_bonus).clamp(0.0_f64, 1.0_f64)
     }
 
     fn calculate_resolution_score(&self, chord: &Chord, pattern: &[Chord]) -> f64 {
@@ -1361,7 +1359,7 @@ impl ChordProgressionSuggester {
         let total_complexity = complexity + modification_complexity;
 
         // Invert score (lower complexity = higher lookup score)
-        ((10.0 - total_complexity) / 10.0).max(0.0).min(1.0)
+        ((10.0 - total_complexity) / 10.0).clamp(0.0, 1.0)
     }
 
     fn calculate_length_score(&self, chord: &Chord) -> f64 {
@@ -1418,7 +1416,7 @@ impl ChordProgressionSuggester {
 
         // Invert and normalize so higher complexity = lower score
         let normalized = (10.0 - total_complexity) / 10.0;
-        normalized.max(0.0).min(1.0)
+        normalized.clamp(0.0, 1.0)
     }
 
     fn calculate_magic_score(&self, chord: &Chord) -> f64 {
@@ -1458,9 +1456,7 @@ impl ChordProgressionSuggester {
             _ => 0.0,
         };
 
-        ((base_popularity * root_popularity) - complexity_penalty + special_bonus)
-            .max(0.0)
-            .min(1.0)
+        ((base_popularity * root_popularity) - complexity_penalty + special_bonus).clamp(0.0, 1.0)
     }
 }
 

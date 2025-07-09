@@ -85,8 +85,8 @@ pub fn scale40_decode(encoded: &str) -> SerializationResult<[bool; 12]> {
 
     // Step 3: Convert bit pattern to boolean array
     let mut fingerprint = [false; 12];
-    for i in 0..12 {
-        fingerprint[i] = (bit_pattern & (1 << i)) != 0;
+    for (i, item) in fingerprint.iter_mut().enumerate() {
+        *item = (bit_pattern & (1 << i)) != 0;
     }
 
     Ok(fingerprint)

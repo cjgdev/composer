@@ -991,6 +991,7 @@ mod tests {
     use wasm_bindgen_test::*;
 
     #[wasm_bindgen_test]
+    #[test]
     fn test_chord_creation() {
         let chord = WasmChord::new(1, 5).unwrap();
         assert_eq!(chord.root(), 1);
@@ -999,6 +1000,7 @@ mod tests {
     }
 
     #[wasm_bindgen_test]
+    #[test]
     fn test_chord_serialization() {
         let chord = WasmChord::new(1, 5).unwrap();
         let hex = chord.to_hex().unwrap();
@@ -1009,6 +1011,7 @@ mod tests {
     }
 
     #[wasm_bindgen_test]
+    #[test]
     fn test_scale_creation() {
         let major = WasmScaleFingerprint::major();
         assert!(major.is_diatonic());
@@ -1016,6 +1019,7 @@ mod tests {
     }
 
     #[wasm_bindgen_test]
+    #[test]
     fn test_stable_scale_degrees() {
         let chord = WasmChord::new(1, 5).unwrap();
         let scale = WasmScaleFingerprint::major();
@@ -1028,6 +1032,7 @@ mod tests {
     }
 
     #[wasm_bindgen_test]
+    #[test]
     fn test_chord_complexity() {
         let triad = WasmChord::new(1, 5).unwrap();
         let complexity = get_chord_complexity_wasm(&triad, "major").unwrap();
@@ -1039,6 +1044,7 @@ mod tests {
     }
 
     #[wasm_bindgen_test]
+    #[test]
     fn test_roman_numeral() {
         let chord = WasmChord::new(1, 5).unwrap();
         let scale = WasmScaleFingerprint::major();
@@ -1047,6 +1053,7 @@ mod tests {
     }
 
     #[wasm_bindgen_test]
+    #[test]
     fn test_version() {
         let version = get_version();
         assert_eq!(version, "2.35.2");

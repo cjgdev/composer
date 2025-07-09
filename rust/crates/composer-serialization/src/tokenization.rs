@@ -113,10 +113,7 @@ pub fn tokenize_note_as_raw(note: &Note, _scale: &ScaleFingerprint) -> Serializa
     // Simplified MIDI conversion for demo (in practice would use scale context)
     let midi_value = note.octave as u16 * 12 + note.scale_degree as u16;
     let chromatic = (midi_value + 12) % 12;
-    let octave = std::cmp::max(
-        OCTAVE_RANGE_MIN,
-        std::cmp::min(OCTAVE_RANGE_MAX, (midi_value / 12) as u8),
-    );
+    let octave = ((midi_value / 12) as u8).clamp(OCTAVE_RANGE_MIN, OCTAVE_RANGE_MAX);
 
     Ok(format!(
         "{}{:x} {}{:x}",

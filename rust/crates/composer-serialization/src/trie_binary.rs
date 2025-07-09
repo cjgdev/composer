@@ -43,7 +43,7 @@ impl TrieNode {
         let key = pattern[0].clone();
         let remaining = &pattern[1..];
 
-        let child = self.children.entry(key).or_insert_with(TrieNode::new);
+        let child = self.children.entry(key).or_default();
         child.add_pattern(remaining, id);
     }
 

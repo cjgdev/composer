@@ -38,8 +38,11 @@ dependencies = [
 [project.optional-dependencies]
 test = [
     "pytest>=7.0",
-    "pytest-cov",
-    "pytest-benchmark",
+    "pytest-cov>=4.0",
+    "pytest-benchmark>=4.0",
+    "pytest-mock>=3.10",
+    "pytest-xdist>=3.0",  # For parallel test execution
+    "pytest-timeout>=2.1",  # For test timeouts
 ]
 dev = [
     "ruff",
@@ -63,6 +66,8 @@ notebooks = [
     "plotly>=5.15.0",
     "scipy>=1.10.0",
     "ipywidgets>=8.0.0",  # For interactive widgets
+    "networkx>=3.1",
+    "scikit-learn>=1.3.2",
 ]
 all = [
     "composer[test,dev,docs,notebooks]",
@@ -103,4 +108,23 @@ addopts = [
     "--cov=composer",
     "--cov-report=term-missing",
     "--cov-report=html",
+    "--cov-report=xml",
+    "--cov-fail-under=80",
+    "--tb=short",
+    "--durations=10",
+    "-v",
 ]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "performance: marks tests as performance tests",
+    "ai: marks tests as AI-related tests",
+    "serialization: marks tests as serialization-related tests",
+    "benchmark: marks tests as benchmark tests",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+# timeout = 300  # 5 minute timeout for individual tests
+# timeout_method = "thread"

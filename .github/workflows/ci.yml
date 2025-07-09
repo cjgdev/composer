@@ -198,28 +198,42 @@ jobs:
 
       - name: Install browser drivers for testing
         run: |
-          # Install Firefox and Chrome drivers for headless browser testing
+          # Install Firefox and Chrome with error handling
+          set -e
+          
+          # Install Firefox
           sudo apt-get update
           sudo apt-get install -y firefox-esr
           
           # Install geckodriver
           GECKO_VERSION=$(curl -s https://api.github.com/repos/mozilla/geckodriver/releases/latest | jq -r '.tag_name')
+          echo "Installing geckodriver version: $GECKO_VERSION"
           wget -q "https://github.com/mozilla/geckodriver/releases/download/${GECKO_VERSION}/geckodriver-${GECKO_VERSION}-linux64.tar.gz"
           tar -xzf "geckodriver-${GECKO_VERSION}-linux64.tar.gz"
           sudo mv geckodriver /usr/local/bin/
+          geckodriver --version
           
-          # Install Chrome and chromedriver
-          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+          # Install Chrome
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /usr/share/keyrings/google-chrome-keyring.gpg
+          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome-keyring.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable
           
-          # Install chromedriver
-          CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d. -f1)
-          CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION}")
+          # Install chromedriver with better error handling
+          CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d. -f1-3)
+          echo "Chrome version: $CHROME_VERSION"
+          
+          # Try Chrome for Testing API first, fall back to legacy API
+          if ! CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION%%.*}"); then
+            echo "Falling back to latest stable chromedriver"
+            CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
+          fi
+          
+          echo "Installing chromedriver version: $CHROMEDRIVER_VERSION"
           wget -q "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
           unzip -q chromedriver_linux64.zip
           sudo mv chromedriver /usr/local/bin/
+          chromedriver --version
 
       - name: Install npm dependencies
         run: npm ci
@@ -232,12 +246,25 @@ jobs:
 
       - name: Run browser tests
         run: npm run test:browser
+        env:
+          DISPLAY: :99
 
       - name: Test Node.js example
         run: npm run test:node-example
 
       - name: Test TypeScript examples
         run: npm run test:ts-examples
+        
+      - name: Upload test results on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wasm-test-results
+          path: |
+            wasm/test-results/
+            wasm/dist/
+            wasm/*.log
+          retention-days: 7
 
       - name: Verify package can be published
         run: npm pack --dry-run
